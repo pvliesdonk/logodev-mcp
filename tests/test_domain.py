@@ -354,3 +354,54 @@ async def test_describe_company_encodes_domain_in_path() -> None:
         assert route.called
     finally:
         await service.stop()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("status", "needle"),
+    [
+        (403, "Authentication or plan-tier"),
+        (429, "rate limit"),
+        (500, "logo.dev error: 500"),
+    ],
+)
+async def test_rest_methods_map_status_codes(status: int, needle: str) -> None:
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(f"{API_BASE}/brand/nike.com").mock(
+                return_value=httpx.Response(status, text="boom")
+            )
+            with pytest.raises(LogoDevError) as exc:
+                await service.get_brand("nike.com")
+        assert exc.value.status == status
+        assert needle in exc.value.message
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("factory_name", "arg"),
+    [
+        ("search_brands", "   "),
+        ("describe_company", ""),
+        ("get_brand", "  "),
+    ],
+)
+async def test_rest_methods_reject_blank_input_before_http(
+    factory_name: str, arg: str
+) -> None:
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            route = respx.get(url__startswith=API_BASE).mock(
+                return_value=httpx.Response(200, json={})
+            )
+            with pytest.raises(LogoDevError):
+                await getattr(service, factory_name)(arg)
+            assert route.called is False
+    finally:
+        await service.stop()

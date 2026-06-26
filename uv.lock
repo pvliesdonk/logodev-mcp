@@ -1242,6 +1242,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastmcp-pvl-core" },
+    { name = "httpx" },
     { name = "typer" },
 ]
 
@@ -1277,6 +1278,7 @@ docs = [
 requires-dist = [
     { name = "fastmcp-pvl-core", specifier = ">=4.0.0,<5" },
     { name = "fastmcp-pvl-core", extras = ["debug"], marker = "extra == 'debug'" },
+    { name = "httpx", specifier = ">=0.27" },
     { name = "typer", specifier = ">=0.12" },
 ]
 provides-extras = ["debug"]

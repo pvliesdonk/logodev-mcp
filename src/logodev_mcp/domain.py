@@ -95,19 +95,25 @@ class Service:
 
     async def stop(self) -> None:
         """Close any open clients.  Safe to call more than once."""
-        for client in (self._api, self._img):
-            if client is not None:
-                await client.aclose()
+        # Null the references first so a failure mid-close cannot leave a
+        # half-closed client reachable, and a second stop() is always a no-op.
+        api, img = self._api, self._img
         self._api = None
         self._img = None
+        for client in (api, img):
+            if client is not None:
+                await client.aclose()
 
-    # --- internal helpers (filled in by later tasks) ---
+    # --- internal helpers ---
 
     def _raise_for_status(self, resp: httpx.Response, *, subject: str) -> None:
         """Map an error response to a :class:`LogoDevError`; no-op on success."""
         code = resp.status_code
         if code < 400:
             return
+        # Log server-side before surfacing the user-facing string — the caller
+        # only sees the returned message, so this is the operator's trace.
+        logger.warning("logodev_http_error status=%s subject=%s", code, subject)
         if code in (401, 403):
             raise LogoDevError(
                 "Authentication or plan-tier problem — check your "
@@ -133,8 +139,14 @@ class Service:
         try:
             resp = await client.get(path, params=params)
         except httpx.TimeoutException as exc:
+            logger.warning("logodev_timeout subject=%s", subject)
             raise LogoDevError("logo.dev did not respond in time.") from exc
         except httpx.TransportError as exc:
+            logger.warning(
+                "logodev_transport_error subject=%s error=%s",
+                subject,
+                type(exc).__name__,
+            )
             raise LogoDevError("Cannot reach logo.dev.") from exc
         self._raise_for_status(resp, subject=subject)
         return resp
