@@ -1,6 +1,6 @@
 [project]
 name = "logodev-mcp"
-version = "0.1.0"
+version = "1.0.0"
 description = "Look up company logos and brand data via the logo.dev API."
 readme = "README.md"
 license = "LicenseRef-Proprietary"  # starter: TODO update when you pick a license (see LICENSE)
