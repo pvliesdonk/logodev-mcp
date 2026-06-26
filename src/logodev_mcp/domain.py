@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
@@ -28,6 +29,8 @@ _IDENTIFIER_PATHS = {
 }
 _FORMATS = ("jpg", "png", "webp")
 _THEMES = ("auto", "light", "dark")
+# "404" is the logo.dev API's documented literal: return HTTP 404 instead of a
+# placeholder monogram when no logo exists for the identifier.
 _FALLBACKS = ("monogram", "404")
 _STRATEGIES = ("suggest", "match")
 
@@ -59,7 +62,13 @@ class Service:
         self.has_secret = False
 
     async def start(self) -> None:
-        """Load config (if not injected) and build the configured clients."""
+        """Load config (if not injected) and build the configured clients.
+
+        Re-entrant: if called while already started, the existing clients are
+        closed first so their connection pools are not leaked.
+        """
+        if self._api is not None or self._img is not None:
+            await self.stop()
         config = self._config or ProjectConfig.from_env()
         self._config = config
         self.has_publishable = bool(config.publishable_key)
@@ -74,10 +83,14 @@ class Service:
         if self.has_publishable:
             self._img = httpx.AsyncClient(base_url=IMG_BASE, timeout=_TIMEOUT)
 
+        # Report each API by its client object, not by the secret-named flags,
+        # so the secret-key value never reaches a logging sink (CodeQL
+        # py/clear-text-logging-sensitive-data tracks config.secret_key →
+        # has_secret).
         logger.info(
-            "service_started publishable=%s secret=%s",
-            self.has_publishable,
-            self.has_secret,
+            "service_started image_api=%s rest_api=%s",
+            self._img is not None,
+            self._api is not None,
         )
 
     async def stop(self) -> None:
@@ -140,6 +153,7 @@ class Service:
         url_only: bool = False,
     ) -> tuple[str, bytes | None]:
         """Build the img.logo.dev URL and (unless ``url_only``) fetch the bytes."""
+        # The _config/_img None checks also narrow them to non-None for mypy below.
         if not self.has_publishable or self._config is None or self._img is None:
             raise LogoDevError(
                 "Logo API not configured — set LOGODEV_MCP_PUBLISHABLE_KEY."
@@ -216,7 +230,9 @@ class Service:
         api = self._require_secret()
         if not domain.strip():
             raise LogoDevError("domain must not be empty.")
-        resp = await self._get(api, f"/describe/{domain}", subject=domain)
+        resp = await self._get(
+            api, f"/describe/{quote(domain, safe='')}", subject=domain
+        )
         return resp.json()
 
     async def get_brand(self, domain: str) -> Any:
@@ -224,5 +240,5 @@ class Service:
         api = self._require_secret()
         if not domain.strip():
             raise LogoDevError("domain must not be empty.")
-        resp = await self._get(api, f"/brand/{domain}", subject=domain)
+        resp = await self._get(api, f"/brand/{quote(domain, safe='')}", subject=domain)
         return resp.json()

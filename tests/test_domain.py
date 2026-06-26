@@ -40,11 +40,25 @@ async def test_start_with_no_keys_builds_no_clients() -> None:
 
 @pytest.mark.asyncio
 async def test_stop_is_idempotent() -> None:
-    service = Service(ProjectConfig(secret_key="sk_y"))
+    service = Service(ProjectConfig(publishable_key="pk_x", secret_key="sk_y"))
     await service.start()
     await service.stop()
     await service.stop()  # second close must not raise
     assert service._api is None
+    assert service._img is None
+
+
+@pytest.mark.asyncio
+async def test_start_twice_replaces_clients_without_leak() -> None:
+    service = Service(ProjectConfig(secret_key="sk_y"))
+    await service.start()
+    first_api = service._api
+    await service.start()  # re-entrant: must close the first client, not leak it
+    try:
+        assert first_api is not None and first_api.is_closed
+        assert service._api is not None and service._api is not first_api
+    finally:
+        await service.stop()
 
 
 def test_logodev_error_carries_message_and_status() -> None:
@@ -283,13 +297,13 @@ async def test_rest_methods_require_secret_key() -> None:
     service = Service(ProjectConfig())  # no keys
     await service.start()
     try:
-        for call in (
-            service.search_brands("nike"),
-            service.describe_company("nike.com"),
-            service.get_brand("nike.com"),
+        for factory, args in (
+            (service.search_brands, ("nike",)),
+            (service.describe_company, ("nike.com",)),
+            (service.get_brand, ("nike.com",)),
         ):
             with pytest.raises(LogoDevError):
-                await call
+                await factory(*args)
     finally:
         await service.stop()
 
@@ -306,5 +320,37 @@ async def test_search_brands_maps_timeout() -> None:
             with pytest.raises(LogoDevError) as exc:
                 await service.search_brands("nike")
         assert "did not respond" in exc.value.message
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_search_brands_maps_connect_error() -> None:
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(f"{API_BASE}/search").mock(
+                side_effect=httpx.ConnectError("refused")
+            )
+            with pytest.raises(LogoDevError) as exc:
+                await service.search_brands("nike")
+        assert "Cannot reach" in exc.value.message
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_describe_company_encodes_domain_in_path() -> None:
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            route = respx.get(f"{API_BASE}/describe/foo%2Fbar").mock(
+                return_value=httpx.Response(200, json={})
+            )
+            await service.describe_company("foo/bar")
+        # '/' must be percent-encoded, not split into a new path segment.
+        assert route.called
     finally:
         await service.stop()
