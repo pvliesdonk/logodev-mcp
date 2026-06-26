@@ -1,0 +1,26 @@
+# logodev-mcp
+
+> Look up company logos and brand data via the logo.dev API.
+
+## Getting Started
+
+- [Home](https://pvliesdonk.github.io/logodev-mcp/1.0/index.md)
+- [Installation](https://pvliesdonk.github.io/logodev-mcp/1.0/installation/index.md)
+- [Configuration](https://pvliesdonk.github.io/logodev-mcp/1.0/configuration/index.md)
+- [Configuration Generator](https://pvliesdonk.github.io/logodev-mcp/1.0/configuration-generator/index.md)
+
+## Guides
+
+- [Authentication](https://pvliesdonk.github.io/logodev-mcp/1.0/guides/authentication/index.md)
+
+## MCP Interface
+
+- [Tools](https://pvliesdonk.github.io/logodev-mcp/1.0/tools/index.md)
+- [Prompts](https://pvliesdonk.github.io/logodev-mcp/1.0/prompts/index.md)
+
+## Deployment
+
+- [Claude Desktop](https://pvliesdonk.github.io/logodev-mcp/1.0/deployment/claude-desktop/index.md)
+- [Docker](https://pvliesdonk.github.io/logodev-mcp/1.0/deployment/docker/index.md)
+- [OIDC Authentication](https://pvliesdonk.github.io/logodev-mcp/1.0/deployment/oidc/index.md)
+

@@ -1,0 +1,727 @@
+# logodev-mcp
+
+> Look up company logos and brand data via the logo.dev API.
+
+# Getting Started
+
+# Logo.dev MCP
+
+Look up company logos and brand data via the logo.dev API.
+
+## Getting started
+
+- [Installation](https://pvliesdonk.github.io/logodev-mcp/1.0/installation/index.md)
+- [Configuration](https://pvliesdonk.github.io/logodev-mcp/1.0/configuration/index.md)
+- [Tools](https://pvliesdonk.github.io/logodev-mcp/1.0/tools/index.md)
+
+## Features
+
+- *Add features specific to your server here.*
+
+## What you can do
+
+- *Add usage examples here.*
+
+# Installation
+
+## From PyPI
+
+```
+pip install logodev-mcp
+```
+
+## From Docker
+
+```
+docker pull ghcr.io/pvliesdonk/logodev-mcp:latest
+```
+
+## From source
+
+```
+git clone https://github.com/pvliesdonk/logodev-mcp
+cd logodev-mcp
+uv sync --all-extras --all-groups
+```
+
+# Configuration
+
+Logo.dev MCP is configured via environment variables with the `LOGODEV_MCP_` prefix.
+
+## Common variables
+
+See `fastmcp-pvl-core`'s README for the full list of universal variables (`LOGODEV_MCP_TRANSPORT`, `LOGODEV_MCP_HOST`, `LOGODEV_MCP_PORT`, `LOGODEV_MCP_HTTP_PATH`, `LOGODEV_MCP_BASE_URL`, auth vars, etc.).
+
+## Domain variables
+
+Document your project-specific variables here.
+
+# Configuration Generator
+
+Answer a few questions and copy a ready-to-use configuration for your exact deployment. Everything runs in your browser; nothing you type is sent anywhere. Secret fields (tokens, keys) are never included in the shareable link; replace the `<YOUR_...>` placeholders if you leave them blank.
+
+Loading the configuration generator…
+# Guides
+
+# Authentication
+
+This guide covers how to protect your MCP server with authentication. Choose the mode that fits your deployment.
+
+Transport requirement
+
+Authentication only works with HTTP transport (`--transport http` or `sse`). It has no effect with `--transport stdio`.
+
+## Auth modes
+
+The server supports four authentication modes:
+
+| Mode             | When to use                                                                              | Configuration                                                   |
+| ---------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **Multi-auth**   | Mixed clients, such as Claude web (OIDC) + Claude Code (bearer token) on the same server | Set both `LOGODEV_MCP_BEARER_TOKEN` and all four OIDC variables |
+| **Bearer token** | Simple deployments behind a VPN, Docker compose stacks, development                      | Set `LOGODEV_MCP_BEARER_TOKEN` only                             |
+| **OIDC**         | Production with user identity, SSO, multi-user access                                    | Set all four OIDC variables only                                |
+| **No auth**      | Local stdio usage, trusted networks                                                      | Default (nothing to configure)                                  |
+
+When both bearer token and OIDC are configured, the server accepts **either** credential: a valid bearer token or a valid OIDC session. This is useful when different clients require different authentication flows against the same server instance.
+
+______________________________________________________________________
+
+## Bearer token
+
+The simplest way to protect your server. A single static token shared between server and clients.
+
+### Setup
+
+1. Generate a random token:
+
+   ```
+   openssl rand -hex 32
+   ```
+
+1. Set the environment variable:
+
+   ```
+   LOGODEV_MCP_BEARER_TOKEN=your-generated-token
+   ```
+
+1. Start the server with HTTP transport:
+
+   ```
+   mcp-server serve --transport http --port 8000
+   ```
+
+### Client usage
+
+Clients must include the token in every request:
+
+```
+Authorization: Bearer your-generated-token
+```
+
+### When to use bearer token
+
+- Deployments behind a VPN or firewall
+- Docker compose stacks where services communicate internally
+- Development and testing environments
+- Any scenario where full OIDC is overkill
+
+### Mapped bearer tokens (multi-subject)
+
+The bearer-token mode above shares one subject across every authenticated caller. By default this is the library's `bearer-anon`; override with `LOGODEV_MCP_BEARER_DEFAULT_SUBJECT`. For audit logs and authorization that distinguish callers, switch to mapped-token mode by pointing `LOGODEV_MCP_BEARER_TOKENS_FILE` at a TOML file:
+
+```
+# tokens.toml
+[tokens]
+"ghp_alice_xxxxxxxx" = "user:alice@example.com"
+"sk_ci_yyyyyyyy"     = "service:ci-bot"
+```
+
+Each token resolves to a distinct subject string for downstream attribution. Subject strings are opaque: the `<kind>:<id>` convention (`user:`, `service:`, `token:`) is documentation only. When `BEARER_TOKENS_FILE` is set it overrides `BEARER_TOKEN` (a `WARNING` is logged if both are present). A missing or malformed file aborts startup with `ConfigurationError` rather than silently denying every request.
+
+______________________________________________________________________
+
+## OIDC
+
+Full OAuth 2.1 authentication using an external identity provider. Supports user login flows, SSO, and multi-user access control.
+
+### How it works
+
+The server proxies OIDC itself, with no external auth sidecar to deploy:
+
+```
+Client → mcp-server → OIDC Provider
+```
+
+1. Client connects to the server
+1. Server redirects to the OIDC provider for login
+1. Provider authenticates the user and returns a code
+1. Server exchanges the code for tokens
+1. Subsequent requests include the JWT
+
+### Required variables
+
+| Variable                         | Description                                         |
+| -------------------------------- | --------------------------------------------------- |
+| `LOGODEV_MCP_BASE_URL`           | Public base URL (such as `https://mcp.example.com`) |
+| `LOGODEV_MCP_OIDC_CONFIG_URL`    | OIDC discovery endpoint                             |
+| `LOGODEV_MCP_OIDC_CLIENT_ID`     | Client ID registered with your provider             |
+| `LOGODEV_MCP_OIDC_CLIENT_SECRET` | Client secret                                       |
+
+### Optional variables
+
+| Variable                               | Default   | Description                                                                                                                       |
+| -------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `LOGODEV_MCP_OIDC_JWT_SIGNING_KEY`     | ephemeral | JWT signing key (**required on Linux/Docker**)                                                                                    |
+| `LOGODEV_MCP_OIDC_AUDIENCE`            | n/a       | Expected JWT audience claim; leave unset if your provider does not set one                                                        |
+| `LOGODEV_MCP_OIDC_REQUIRED_SCOPES`     | `openid`  | Comma-separated required scopes                                                                                                   |
+| `LOGODEV_MCP_OIDC_VERIFY_ACCESS_TOKEN` | `false`   | Set `true` to verify the access token as a JWT instead of the id token; useful for audience-claim validation on JWT access tokens |
+
+JWT signing key on Linux/Docker
+
+Without `OIDC_JWT_SIGNING_KEY`, FastMCP generates an ephemeral key that invalidates all tokens on restart. Always set a stable key in production:
+
+```
+openssl rand -hex 32
+```
+
+Long-running sessions
+
+Current MCP clients do not reliably refresh tokens; see [Known Limitations](#known-limitations-mcp-oauth-token-refresh). Configure **all** token lifetimes (access, id, refresh) on your identity provider to cover a full workday (8 hours or more). For simpler deployments, bearer token auth is unaffected by these limitations.
+
+For the full OIDC reference (env vars, Docker Compose, subpath deployments, architecture):
+
+- [OIDC Authentication reference](https://pvliesdonk.github.io/logodev-mcp/1.0/deployment/oidc/index.md)
+
+______________________________________________________________________
+
+## Troubleshooting
+
+### "invalid client" error
+
+The `client_id` and/or `redirect_uris` in your OIDC provider config don't match the values in your `.env` file. Verify both sides match exactly.
+
+### Tokens invalidated after restart
+
+You're missing `LOGODEV_MCP_OIDC_JWT_SIGNING_KEY`. Without it, FastMCP generates an ephemeral key on each startup. Generate and set a stable key:
+
+```
+openssl rand -hex 32
+```
+
+### Auth has no effect
+
+Authentication only works with HTTP transport. If you're using `--transport stdio`, auth is silently ignored. Switch to `--transport http`.
+
+### Bearer token not working
+
+- Verify the env var is set and non-empty (whitespace-only values are ignored)
+- Check that clients send `Authorization: Bearer <token>` (not `Basic` or other schemes)
+- If OIDC is also configured, multi-auth is active: both bearer and OIDC are accepted simultaneously
+
+### OIDC redirect fails
+
+- Verify `BASE_URL` matches your public URL exactly (including any subpath prefix)
+- For subpath deployments, see the [subpath deployment guide](https://pvliesdonk.github.io/logodev-mcp/1.0/deployment/oidc/#subpath-deployments); `BASE_URL` must include the prefix, `HTTP_PATH` must not
+- Check that `redirect_uris` in your provider config includes your callback URL (such as `https://mcp.example.com/auth/callback`)
+
+### Session drops after token expiry
+
+**Symptom:** the MCP client works for a period (often ~1 hour), then starts returning 401 errors or stops responding. Restarting the client fixes it temporarily.
+
+**Root cause:** this is almost always a token lifetime issue, not a server bug. Check three things:
+
+1. **id_token lifetime** (most common): When using `verify_id_token` mode (the default for Authelia), the server re-validates the upstream `id_token` on every request. If your provider's `id_token` lifetime is shorter than the `access_token` lifetime, the session dies at the `id_token` expiry, even though the access token is still valid. Authelia defaults `id_token` to 1 hour. **Fix: set `id_token` lifetime to match `access_token`** in your provider config.
+1. **access_token lifetime**: If both `id_token` and `access_token` are set correctly but sessions still drop, check that the provider's `expires_in` response matches your configured lifetime.
+1. **No refresh token**: See [Known Limitations](#known-limitations-mcp-oauth-token-refresh) below; current MCP clients cannot refresh tokens, so sessions are limited to the token lifetime.
+
+**Workaround:** configure **all** token lifetimes on your identity provider to cover a full workday:
+
+```
+# Authelia example
+lifespans:
+  custom:
+    mcp_long_lived:
+      access_token: '8h'
+      id_token: '8h'        # must match access_token for verify_id_token mode
+      refresh_token: '30d'
+```
+
+### Opaque access tokens (Authelia)
+
+Authelia issues opaque (non-JWT) access tokens. This is handled automatically: the server verifies the `id_token` instead. No extra configuration needed.
+
+______________________________________________________________________
+
+## Known Limitations: MCP OAuth token refresh
+
+Ecosystem-wide issue
+
+The limitations below affect **all** OAuth-protected MCP servers, not just this one. They are caused by issues in the MCP client implementations (Claude Code, Claude.ai, Claude Desktop) and the MCP Python SDK. Check the linked tracking issues for current status.
+
+### The problem
+
+MCP clients cannot maintain sessions beyond the token lifetime because token refresh does not work. When tokens expire, the session drops and requires manual re-authentication. This affects every provider: Authelia, Keycloak, Google, and others.
+
+### Why refresh doesn't work
+
+Three independent issues prevent token refresh:
+
+| Layer              | Issue                                                                                                                          | Impact                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| **Claude Code**    | Stores refresh tokens but never uses them ([claude-code#21333](https://github.com/anthropics/claude-code/issues/21333))        | Refresh tokens are obtained and saved but never sent back to refresh expired access tokens     |
+| **Claude Code**    | Never requests `offline_access` scope ([claude-code#7744](https://github.com/anthropics/claude-code/issues/7744))              | Most OIDC providers won't issue a refresh token without this scope                             |
+| **MCP Python SDK** | Token refresh deadlocks inside SSE streams ([python-sdk#1326](https://github.com/modelcontextprotocol/python-sdk/issues/1326)) | Even with a valid refresh token, the SDK hangs when attempting refresh during an active stream |
+
+The server-side refresh architecture (FastMCP's `OAuthProxy.exchange_refresh_token()`) is correctly implemented and would work, but it requires the client to initiate the refresh, which none of the current clients do reliably.
+
+### What works today
+
+**Bearer token auth** is unaffected by all of the above. If your deployment allows it (such as Claude Code with env vars, or API clients), bearer tokens are the simplest and most reliable option.
+
+**Long token lifetimes** are the only viable workaround for OIDC. Set all three lifetimes (access, id, refresh) to cover your typical session duration:
+
+- `access_token: '8h'`: covers a workday
+- `id_token: '8h'`: **must match access_token** when using `verify_id_token` mode (critical for Authelia)
+- `refresh_token: '30d'`: ready for when clients support refresh
+- Include `offline_access` in provider-side scopes; no effect today, but enables refresh when clients are fixed
+
+### Tracking
+
+These upstream issues are actively tracked:
+
+- [anthropics/claude-code#21333](https://github.com/anthropics/claude-code/issues/21333): refresh tokens stored but never used
+- [anthropics/claude-code#7744](https://github.com/anthropics/claude-code/issues/7744): `offline_access` scope never requested
+- [modelcontextprotocol/python-sdk#1326](https://github.com/modelcontextprotocol/python-sdk/issues/1326): SSE refresh deadlock
+
+When these are resolved, OIDC sessions should persist indefinitely via automatic token refresh with no changes needed server-side.
+# MCP Interface
+
+# Tools
+
+The tools registered in this server are listed below. See the [FastMCP tools documentation](https://gofastmcp.com/servers/tools) for the full tool API.
+
+Tools are registered only when the API key they need is configured (see [Configuration](https://pvliesdonk.github.io/logodev-mcp/1.0/configuration/index.md)); a tool whose key is absent is hidden.
+
+## `get_logo`
+
+Fetch a company logo image by domain, stock ticker, ISIN, crypto symbol, or brand name. Supports `size`, `format`, `theme`, `greyscale`, `retina`, and `fallback` options, and a `url_only` flag to return just the image URL. Returns the image URL plus the logo (or only the URL when `url_only`). **Requires the publishable key** (`LOGODEV_MCP_PUBLISHABLE_KEY`).
+
+## `search_brands`
+
+Resolve a brand or company name to candidate domains (with `suggest` or `match` strategy). Returns a JSON array of candidates. **Requires the secret key** (`LOGODEV_MCP_SECRET_KEY`).
+
+## `describe_company`
+
+Return structured company data (name, description, colours, socials) for a domain, as JSON. **Requires the secret key.**
+
+## `get_brand`
+
+Return the full brand profile (logo, brandmark, banners, colours, and description) for a domain, as JSON. A richer superset of `describe_company`. **Requires the secret key.**
+
+# Prompts
+
+MCP prompts are reusable prompt templates exposed to clients. The scaffold ships a minimal set defined in `src/logodev_mcp/prompts.py`; add domain-specific prompts there and document them in this page.
+
+## Example
+
+```
+@mcp.prompt()
+def summarize(topic: str) -> str:
+    """Summarize the given topic in three sentences."""
+    return f"Write a three-sentence summary of: {topic}"
+```
+
+See the [FastMCP prompts documentation](https://gofastmcp.com/servers/prompts) for the full prompt API.
+
+## Built-in prompts
+
+*None in the scaffold.* Define prompts with `@mcp.prompt(...)` decorators in `src/logodev_mcp/prompts.py` and list them here with their arguments, usage, and example output.
+# Deployment
+
+# Claude Desktop
+
+Logo.dev MCP integrates with [Claude Desktop](https://claude.ai/download) via the stdio transport.
+
+## Setup
+
+### 1. Install
+
+From PyPI:
+
+```
+pip install logodev-mcp
+```
+
+Or with uv (installs `logodev-mcp` as a global command on your PATH):
+
+```
+uv tool install logodev-mcp
+```
+
+Or download the `.mcpb` bundle from the [GitHub Releases](https://github.com/pvliesdonk/logodev-mcp/releases) page and double-click to install; Claude Desktop prompts for required env vars via a GUI wizard, no manual JSON editing needed.
+
+### 2. Configure Claude Desktop
+
+If you installed via `.mcpb`, skip this step — Claude Desktop was configured automatically by the wizard.
+
+Otherwise, add the server to your Claude Desktop configuration file. The path varies by operating system:
+
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+- **Linux:** `~/.config/Claude/claude_desktop_config.json`
+
+```
+{
+  "mcpServers": {
+    "logodev-mcp": {
+      "command": "logodev-mcp",
+      "args": ["serve"],
+      "env": {
+        "LOGODEV_MCP_READ_ONLY": "true"
+      }
+    }
+  }
+}
+```
+
+### 3. Restart Claude Desktop
+
+Restart the application to pick up the new configuration. If the server connects successfully, `Logo.dev MCP` tools appear in Claude's tool list. If not, see [Troubleshooting](#troubleshooting) below.
+
+## Configuration examples
+
+## Troubleshooting
+
+### Server not appearing in Claude Desktop
+
+1. Check the config file path is correct for your OS
+1. Ensure the JSON is valid (no trailing commas)
+1. Restart Claude Desktop completely (quit and reopen)
+1. Check Claude Desktop logs for error messages
+
+### "Command not found"
+
+Ensure `logodev-mcp` is on your PATH. If installed in a virtualenv, use the full path to the binary. Replace only the `"command"` value in your existing config — keep `"args"` and `"env"` as-is.
+
+macOS/Linux:
+
+```
+{
+  "mcpServers": {
+    "logodev-mcp": {
+      "command": "/Users/me/.venvs/mcp/bin/logodev-mcp",
+      "args": ["serve"],
+      "env": {
+        "LOGODEV_MCP_READ_ONLY": "true"
+      }
+    }
+  }
+}
+```
+
+Windows (`Scripts\` not `bin\`, `.exe` suffix):
+
+```
+{
+  "mcpServers": {
+    "logodev-mcp": {
+      "command": "C:\\Users\\me\\.venvs\\mcp\\Scripts\\logodev-mcp.exe",
+      "args": ["serve"],
+      "env": {
+        "LOGODEV_MCP_READ_ONLY": "true"
+      }
+    }
+  }
+}
+```
+
+# Docker Deployment
+
+## Quick start
+
+```
+docker compose up -d
+```
+
+The server listens on port 8000 with HTTP transport by default.
+
+## Environment variables
+
+| Variable                   | Default               | Description                                                                                                   |
+| -------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `LOGODEV_MCP_READ_ONLY`    | `true`                | Disable write tools                                                                                           |
+| `LOGODEV_MCP_BEARER_TOKEN` | n/a                   | Enable bearer token auth                                                                                      |
+| `LOGODEV_MCP_LOG_LEVEL`    | `INFO`                | Log level                                                                                                     |
+| `LOGODEV_MCP_INSTRUCTIONS` | (computed at startup) | System instructions for LLM context                                                                           |
+| `LOGODEV_MCP_DEBUG_PORT`   | n/a                   | Remote-debugger TCP port (see [Remote debugging](#remote-debugging); requires `--build-arg DEBUG=true` image) |
+| `LOGODEV_MCP_DEBUG_WAIT`   | `false`               | Block startup until IDE attaches (see [Remote debugging](#remote-debugging))                                  |
+
+For OIDC auth variables, see [Authentication](https://pvliesdonk.github.io/logodev-mcp/1.0/guides/authentication/index.md).
+
+## Volumes
+
+| Path            | Purpose                                        |
+| --------------- | ---------------------------------------------- |
+| `/data/service` | Your service data (bind-mount or named volume) |
+| `/data/state`   | State files (FastMCP OIDC state, etc.)         |
+
+## UID/GID
+
+Set `PUID` and `PGID` in your `.env` file to match the owner of bind-mounted directories (default 1000/1000).
+
+## Remote debugging
+
+Production images ship without `debugpy` to keep the image lean. To attach a remote Python debugger from VS Code or PyCharm:
+
+1. **Build with the debug extra:**
+
+   ```
+   docker build --build-arg DEBUG=true -t logodev-mcp:debug .
+   ```
+
+   This installs the `[debug]` optional-dependency group (which pulls `debugpy` transitively from `fastmcp-pvl-core`). Default builds (`DEBUG=false`) skip it.
+
+1. **Run with the debug env vars set and the port mapped:**
+
+   ```
+   docker run --rm \
+     -e LOGODEV_MCP_DEBUG_PORT=5678 \
+     -e LOGODEV_MCP_DEBUG_WAIT=true \
+     -p 127.0.0.1:5678:5678 \
+     -p 8000:8000 \
+     logodev-mcp:debug
+   ```
+
+   | Env var                  | Effect                                                                                                                                            |
+   | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | `LOGODEV_MCP_DEBUG_PORT` | TCP port the debugger listens on (any value parsing to `0` disables; non-numeric or out-of-range values log a WARNING and the listener stays off) |
+   | `LOGODEV_MCP_DEBUG_WAIT` | When truthy (`1`/`true`/`yes`/`on`), block startup until the IDE attaches. Default is non-blocking.                                               |
+
+1. **Attach from VS Code**, adding a launch config:
+
+   ```
+   {
+     "name": "Attach to logodev-mcp",
+     "type": "debugpy",
+     "request": "attach",
+     "connect": { "host": "localhost", "port": 5678 }
+   }
+   ```
+
+   PyCharm uses *Run → Edit Configurations → Python Debug Server* with the same host/port.
+
+Never publish the debug port on a public network
+
+The debug listener binds `0.0.0.0` inside the container so the IDE can reach it from the host, but **debugpy's DAP protocol is unauthenticated**: any peer that can reach the port has arbitrary code execution as the server process. Always bind the port mapping to localhost (`-p 127.0.0.1:5678:5678`) or tunnel via `kubectl port-forward` / SSH. Production images should be built with default `DEBUG=false`.
+
+When the helper is invoked but `debugpy` isn't installed (say, someone sets `DEBUG_PORT` on a non-debug image), it logs a WARNING and continues; this is the safe failure mode.
+
+# OIDC Authentication
+
+Optional token-based authentication for HTTP deployments. OIDC activates automatically when all four required environment variables are set. For an overview of all authentication modes (bearer token, OIDC, no auth), see the [Authentication guide](https://pvliesdonk.github.io/logodev-mcp/1.0/guides/authentication/index.md).
+
+Transport requirement
+
+OIDC requires `--transport http` (or `sse`). It has no effect with `--transport stdio`.
+
+## Required Variables
+
+| Variable                         | Description                                                                                                                                               |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LOGODEV_MCP_BASE_URL`           | Public base URL of the server (such as `https://mcp.example.com`; include prefix when mounted under subpath, such as `https://mcp.example.com/myservice`) |
+| `LOGODEV_MCP_OIDC_CONFIG_URL`    | OIDC discovery endpoint (such as `https://auth.example.com/.well-known/openid-configuration`)                                                             |
+| `LOGODEV_MCP_OIDC_CLIENT_ID`     | OIDC client ID registered with your provider                                                                                                              |
+| `LOGODEV_MCP_OIDC_CLIENT_SECRET` | OIDC client secret                                                                                                                                        |
+
+## Optional Variables
+
+| Variable                               | Default   | Description                                                                                                                                                                                    |
+| -------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LOGODEV_MCP_OIDC_JWT_SIGNING_KEY`     | ephemeral | JWT signing key. **Required on Linux/Docker**: the default is ephemeral and invalidates tokens on restart                                                                                      |
+| `LOGODEV_MCP_OIDC_AUDIENCE`            | n/a       | Expected JWT audience claim; leave unset if your provider does not set one                                                                                                                     |
+| `LOGODEV_MCP_OIDC_REQUIRED_SCOPES`     | `openid`  | Comma-separated required scopes                                                                                                                                                                |
+| `LOGODEV_MCP_OIDC_VERIFY_ACCESS_TOKEN` | `false`   | Set `true` to verify the upstream access token as JWT instead of the id token. Only needed when your provider issues JWT access tokens and you require audience-claim validation on that token |
+
+## JWT Signing Key
+
+The FastMCP default signing key is ephemeral (regenerated on startup), which forces clients to re-authenticate after every restart. Set a stable random secret to avoid this:
+
+```
+# Generate once, store in your .env file
+openssl rand -hex 32
+```
+
+Linux / Docker
+
+On Linux (including Docker), the ephemeral key is especially problematic because it does not persist across process restarts. Always set `LOGODEV_MCP_OIDC_JWT_SIGNING_KEY` in production.
+
+## Setup with Authelia
+
+Note
+
+Authelia does not support Dynamic Client Registration (RFC 7591). Clients must be registered manually in `configuration.yml`.
+
+Opaque access tokens
+
+Authelia issues opaque (non-JWT) access tokens. This is handled automatically: the server verifies the `id_token` (always a standard JWT) instead. No extra configuration is needed.
+
+### 1. Register the client in Authelia
+
+```
+identity_providers:
+  oidc:
+    clients:
+      - client_id: my-mcp-server
+        client_secret: '$pbkdf2-sha512$...'   # authelia crypto hash generate
+        redirect_uris:
+          - https://mcp.example.com/auth/callback
+        grant_types: [authorization_code]
+        response_types: [code]
+        pkce_challenge_method: S256
+        scopes: [openid, profile, email]
+```
+
+### 2. Set environment variables
+
+```
+LOGODEV_MCP_BASE_URL=https://mcp.example.com
+LOGODEV_MCP_OIDC_CONFIG_URL=https://auth.example.com/.well-known/openid-configuration
+LOGODEV_MCP_OIDC_CLIENT_ID=my-mcp-server
+LOGODEV_MCP_OIDC_CLIENT_SECRET=your-client-secret
+LOGODEV_MCP_OIDC_JWT_SIGNING_KEY=$(openssl rand -hex 32)
+```
+
+### 3. Start with HTTP transport
+
+```
+mcp-server serve --transport http --port 8000
+```
+
+## Architecture
+
+The server uses FastMCP's built-in `OIDCProxy` auth provider (not the external `mcp-auth-proxy` sidecar). The authentication flow:
+
+```
+Client → mcp-server (with OIDCProxy) → OIDC Provider (Authelia/Keycloak)
+```
+
+1. Client connects to the MCP server
+1. Server redirects to the OIDC provider for authentication
+1. Provider authenticates the user and returns a code
+1. Server exchanges the code for tokens
+1. Subsequent requests include the JWT token
+
+## Docker Compose with OIDC
+
+```
+services:
+  mcp-server:
+    image: ghcr.io/pvliesdonk/logodev-mcp:latest
+    env_file: .env
+    volumes:
+      - state-data:/data/state
+    environment:
+      FASTMCP_HOME: /data/state/fastmcp
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mcp-server.rule=Host(`mcp.example.com`)"
+      - "traefik.http.routers.mcp-server.tls.certresolver=letsencrypt"
+      - "traefik.http.services.mcp-server.loadbalancer.server.port=8000"
+    networks:
+      - traefik
+
+volumes:
+  state-data:
+
+networks:
+  traefik:
+    external: true
+```
+
+With the corresponding `.env`:
+
+```
+LOGODEV_MCP_READ_ONLY=true
+LOGODEV_MCP_BASE_URL=https://mcp.example.com
+LOGODEV_MCP_OIDC_CONFIG_URL=https://auth.example.com/.well-known/openid-configuration
+LOGODEV_MCP_OIDC_CLIENT_ID=my-mcp-server
+LOGODEV_MCP_OIDC_CLIENT_SECRET=your-client-secret
+LOGODEV_MCP_OIDC_JWT_SIGNING_KEY=your-stable-hex-key
+```
+
+For a prefixed deployment (such as `https://mcp.example.com/myservice/mcp`), see [Subpath Deployments](#subpath-deployments) below.
+
+## Subpath Deployments
+
+When OIDC is enabled behind a reverse-proxy subpath, `BASE_URL` and `HTTP_PATH` serve different roles:
+
+| Variable    | Purpose                                                    | Example                             |
+| ----------- | ---------------------------------------------------------- | ----------------------------------- |
+| `BASE_URL`  | Public URL of the server, **including the subpath prefix** | `https://mcp.example.com/myservice` |
+| `HTTP_PATH` | Internal MCP endpoint mount point (**no subpath prefix**)  | `/mcp`                              |
+
+The reverse proxy strips the subpath prefix before forwarding to the application. FastMCP concatenates `BASE_URL + HTTP_PATH` to build the public resource URL, so including the prefix in both produces broken URLs with duplicated path segments.
+
+Do not duplicate the subpath
+
+Setting `BASE_URL=https://mcp.example.com/myservice` together with `HTTP_PATH=/myservice/mcp` produces a duplicated resource URL: `https://mcp.example.com/myservice/myservice/mcp`. The subpath belongs in `BASE_URL` only.
+
+### Configuration
+
+Environment variables:
+
+```
+LOGODEV_MCP_BASE_URL=https://mcp.example.com/myservice
+LOGODEV_MCP_HTTP_PATH=/mcp
+```
+
+Register this callback URI in your OIDC provider:
+
+```
+https://mcp.example.com/myservice/auth/callback
+```
+
+### Reverse proxy routing
+
+The reverse proxy must:
+
+1. **Strip the prefix** (`/myservice`) from operational routes before forwarding to the app
+1. **Forward OAuth discovery routes** to this service (without stripping prefixes):
+   - `/.well-known/oauth-authorization-server`: authorization server metadata
+   - `/.well-known/oauth-protected-resource/myservice/mcp`: protected resource metadata
+
+Example Traefik configuration:
+
+```
+labels:
+  # Operational routes: strip /myservice prefix before forwarding
+  - "traefik.http.routers.mcp-app.rule=Host(`mcp.example.com`) && PathPrefix(`/myservice`)"
+  - "traefik.http.middlewares.strip-myservice.stripprefix.prefixes=/myservice"
+  - "traefik.http.routers.mcp-app.middlewares=strip-myservice"
+  - "traefik.http.services.mcp-app.loadbalancer.server.port=8000"
+  # OAuth discovery routes: forward without stripping
+  - "traefik.http.routers.mcp-wellknown.rule=Host(`mcp.example.com`) && (PathPrefix(`/.well-known/oauth-authorization-server`) || PathPrefix(`/.well-known/oauth-protected-resource/myservice/mcp`))"
+  - "traefik.http.routers.mcp-wellknown.service=mcp-app"
+```
+
+Note
+
+This configuration requires that no other OAuth service claims `/.well-known/oauth-authorization-server` on this hostname. See [Shared-hostname limitation](#shared-hostname-limitation) below.
+
+### Shared-hostname limitation
+
+Shared-hostname subpath with native OIDC is not supported
+
+When multiple OAuth-capable services share a hostname, native OIDC on a subpath does not work.
+
+**Why:** FastMCP serves the OAuth authorization-server metadata at `/.well-known/oauth-authorization-server` (host root), regardless of the subpath in `BASE_URL`. The FastMCP codebase contains an RFC 8414 path-aware override (`OIDCProxy.get_well_known_routes()`) that would serve it at `/.well-known/oauth-authorization-server/myservice`. However, this method is not wired into the route mounting flow and is effectively dead code.
+
+The protected-resource metadata (`/.well-known/oauth-protected-resource/myservice/mcp`) is correctly path-namespaced and does not collide. Only the authorization-server discovery route is the problem.
+
+This works when the MCP server is the **only** OAuth service on the hostname. It breaks when another service already owns `/.well-known/oauth-authorization-server`.
+
+**Recommendations for shared-hostname scenarios:**
+
+- **Dedicated hostname** (preferred): give the MCP server its own hostname (such as `myservice.example.com`) so discovery routes do not collide.
+- **External auth gateway**: use `mcp-auth-proxy` as a sidecar instead of native OIDC. The MCP server runs unauthenticated behind the proxy, and the proxy handles OAuth discovery at its own routes.

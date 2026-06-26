@@ -1,0 +1,2193 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Look up company logos and brand data via the logo.dev API.">
+      
+      
+      
+        <link rel="canonical" href="https://pvliesdonk.github.io/logodev-mcp/1.0/superpowers/plans/2026-06-26-logodev-mcp/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>logodev-mcp Implementation Plan - logodev-mcp</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/config-wizard.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#logodev-mcp-implementation-plan" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="logodev-mcp" class="md-header__button md-logo" aria-label="logodev-mcp" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            logodev-mcp
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              logodev-mcp Implementation Plan
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/pvliesdonk/logodev-mcp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    pvliesdonk/logodev-mcp
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../installation/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../guides/authentication/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../tools/" class="md-tabs__link">
+          
+  
+  
+  MCP Interface
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../deployment/docker/" class="md-tabs__link">
+          
+  
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="logodev-mcp" class="md-nav__button md-logo" aria-label="logodev-mcp" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    logodev-mcp
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/pvliesdonk/logodev-mcp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    pvliesdonk/logodev-mcp
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configuration-generator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Generator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Interface
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MCP Interface
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../deployment/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../deployment/oidc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OIDC Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../deployment/claude-desktop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Desktop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#global-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Constraints
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Global Constraints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-1-scaffold-from-the-template-and-orient" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 1: Scaffold from the template and orient
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-2-configuration-two-api-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 2: Configuration — two API keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-3-domain-service-lifecycle-clients-error-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 3: Domain Service — lifecycle, clients, error type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-4-domain-get_logo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4: Domain — get_logo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-5-domain-search_brands-describe_company-get_brand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 5: Domain — search_brands, describe_company, get_brand
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-6-tool-registration-conditional-with-image-and-error-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 6: Tool registration — conditional, with Image and error mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-7-server-instructions-docs-and-final-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 7: Server instructions, docs, and final verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#self-review-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Self-Review notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="logodev-mcp-implementation-plan">logodev-mcp Implementation Plan<a class="headerlink" href="#logodev-mcp-implementation-plan" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>For agentic workers:</strong> REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (<code>- [ ]</code>) syntax for tracking.</p>
+</blockquote>
+<p><strong>Goal:</strong> A FastMCP server wrapping the logo.dev API with four tools — <code>get_logo</code>, <code>search_brands</code>, <code>describe_company</code>, <code>get_brand</code> — scaffolded from <code>pvliesdonk/fastmcp-server-template</code>.</p>
+<p><strong>Architecture:</strong> The current template separates plain-Python domain logic (<code>domain.py</code>, a <code>Service</code> class — no FastMCP types) from thin tool wrappers (<code>tools.py</code>). We follow that split: <code>Service</code> holds two <code>httpx.AsyncClient</code>s (one Bearer-authed against <code>api.logo.dev</code>, one token-query against <code>img.logo.dev</code>), does all validation and HTTP, and raises <code>LogoDevError</code>; <code>register_tools</code> reads config to decide which tools to register and wraps each <code>Service</code> method, mapping <code>LogoDevError</code> → an error string and logo bytes → an MCP <code>Image</code>. Two API keys gate two tool groups; missing keys hide their tools.</p>
+<p><strong>Tech Stack:</strong> Python 3.11+, <code>fastmcp&gt;=3</code>, <code>fastmcp-pvl-core</code>, <code>httpx</code>, <code>respx</code> (test mocking), <code>pytest</code>/<code>pytest-asyncio</code>, <code>uv</code>.</p>
+<h2 id="global-constraints">Global Constraints<a class="headerlink" href="#global-constraints" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Env var prefix: <code>LOGODEV_MCP_</code> (exact; set via copier <code>env_prefix=LOGODEV_MCP</code>).</li>
+<li>Python import module: <code>logodev_mcp</code>. Project/PyPI name: <code>logodev-mcp</code>.</li>
+<li>All domain logic in <code>domain.py</code> stays <strong>free of FastMCP types</strong> (no <code>Image</code>, no <code>mcp</code> imports) — keep it unit-testable as plain Python.</li>
+<li><strong>Never edit <code>_server_deps.py</code> or <code>server.py</code> outside their <code>DOMAIN-*</code> sentinel blocks</strong> — they are template-owned and re-rendered by <code>copier update</code>. All our changes live in <code>config.py</code> (inside <code>CONFIG-FIELDS</code> / <code>CONFIG-FROM-ENV</code> sentinels only), <code>domain.py</code>, <code>tools.py</code>, and <code>tests/</code> — all domain-owned.</li>
+<li>Tests use <code>respx</code> to mock HTTP; <strong>no live network calls</strong> in the test suite.</li>
+<li>logo.dev hosts: <code>https://api.logo.dev</code> (Search/Describe/Brand, <code>Authorization: Bearer &lt;secret&gt;</code>), <code>https://img.logo.dev</code> (Logo image CDN, <code>?token=&lt;publishable&gt;</code>).</li>
+<li>Run lint/type/test via <code>uv run ruff check .</code>, <code>uv run mypy src</code>, <code>uv run pytest</code> after each task.</li>
+</ul>
+<hr />
+<h3 id="task-1-scaffold-from-the-template-and-orient">Task 1: Scaffold from the template and orient<a class="headerlink" href="#task-1-scaffold-from-the-template-and-orient" title="Permanent link">&para;</a></h3>
+<p><strong>Files:</strong>
+- Create (via copier): the whole <code>src/logodev_mcp/</code> tree, <code>tests/</code>, <code>pyproject.toml</code>, <code>CLAUDE.md</code>, etc.
+- The pre-existing <code>docs/superpowers/</code> (this plan + the spec) and <code>.git</code> are preserved — <code>docs/superpowers</code> is in the template <code>_exclude</code> list.</p>
+<ul>
+<li>[ ] <strong>Step 1: Run copier into the current directory</strong></li>
+</ul>
+<p>Run from <code>/mnt/code/mcp-servers/logodev-mcp</code>:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>--no-project<span class="w"> </span>--with<span class="w"> </span>copier<span class="w"> </span>copier<span class="w"> </span>copy<span class="w"> </span>--trust<span class="w"> </span>--defaults<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data<span class="w"> </span><span class="nv">project_name</span><span class="o">=</span>logodev-mcp<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data<span class="w"> </span><span class="nv">pypi_name</span><span class="o">=</span>logodev-mcp<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data<span class="w"> </span><span class="nv">python_module</span><span class="o">=</span>logodev_mcp<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data<span class="w"> </span><span class="nv">env_prefix</span><span class="o">=</span>LOGODEV_MCP<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data<span class="w"> </span><span class="nv">human_name</span><span class="o">=</span><span class="s1">&#39;Logo.dev MCP&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data<span class="w"> </span><span class="nv">domain_description</span><span class="o">=</span><span class="s1">&#39;Look up company logos and brand data via the logo.dev API.&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data<span class="w"> </span><span class="nv">github_org</span><span class="o">=</span>pvliesdonk<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data<span class="w"> </span><span class="nv">include_mcp_apps_scaffold</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data<span class="w"> </span><span class="nv">enable_authorization</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>gh:pvliesdonk/fastmcp-server-template<span class="w"> </span>.
+</code></pre></div>
+<p>(If offline, replace the source with the local path <code>/mnt/code/mcp-servers/fastmcp-server-template</code>. <code>--defaults</code> accepts template defaults for any prompt not pinned via <code>--data</code>.)</p>
+<ul>
+<li>[ ] <strong>Step 2: Re-read the generated project instructions</strong></li>
+</ul>
+<p>The scaffold writes <code>CLAUDE.md</code> and <code>.claude/CLAUDE.md</code> with project-specific instructions that OVERRIDE default behavior. <strong>Read both now</strong> before writing any code:</p>
+<div class="highlight"><pre><span></span><code>cat<span class="w"> </span>CLAUDE.md<span class="w"> </span>.claude/CLAUDE.md<span class="w"> </span><span class="m">2</span>&gt;/dev/null
+</code></pre></div>
+<p>Read them with the Read tool and follow them for the rest of this plan (build/test commands, conventions). If they conflict with this plan on mechanics, the generated <code>CLAUDE.md</code> wins; note the conflict.</p>
+<ul>
+<li>[ ] <strong>Step 3: Install and run the baseline suite</strong></li>
+</ul>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>sync<span class="w"> </span>--all-extras<span class="w"> </span>--all-groups
+uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-q
+</code></pre></div>
+<p>Expected: the template smoke tests PASS (the placeholder <code>ping</code> tool and config tests). If <code>pytest</code> collects zero tests or errors, stop and inspect — the scaffold is wrong.</p>
+<ul>
+<li>[ ] <strong>Step 4: Confirm the generated structure matches assumptions</strong></li>
+</ul>
+<div class="highlight"><pre><span></span><code>ls<span class="w"> </span>src/logodev_mcp/
+grep<span class="w"> </span>-n<span class="w"> </span><span class="s1">&#39;CONFIG-FIELDS-START\|CONFIG-FROM-ENV-START&#39;</span><span class="w"> </span>src/logodev_mcp/config.py
+grep<span class="w"> </span>-n<span class="w"> </span><span class="s1">&#39;class Service&#39;</span><span class="w"> </span>src/logodev_mcp/domain.py
+grep<span class="w"> </span>-n<span class="w"> </span><span class="s1">&#39;def register_tools&#39;</span><span class="w"> </span>src/logodev_mcp/tools.py
+</code></pre></div>
+<p>Expected: <code>config.py</code>, <code>domain.py</code>, <code>tools.py</code>, <code>_server_deps.py</code>, <code>server.py</code>, <code>cli.py</code> exist; the two <code>CONFIG-*</code> sentinels exist; <code>Service</code> and <code>register_tools</code> exist. If <code>domain.py</code>/<code>tools.py</code> differ materially from the patterns referenced in later tasks (a <code>Service</code> class with <code>start</code>/<code>stop</code>/<code>ping</code>; <code>register_tools(mcp)</code> using <code>@mcp.tool</code> + <code>Depends(get_service)</code>), adjust the later tasks' insertion points to match the actual scaffold (anchor to these grep patterns, not line numbers).</p>
+<ul>
+<li>[ ] <strong>Step 5: Commit the scaffold</strong></li>
+</ul>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>-A
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;chore: scaffold logodev-mcp from fastmcp-server-template&quot;</span>
+</code></pre></div>
+<hr />
+<h3 id="task-2-configuration-two-api-keys">Task 2: Configuration — two API keys<a class="headerlink" href="#task-2-configuration-two-api-keys" title="Permanent link">&para;</a></h3>
+<p><strong>Files:</strong>
+- Modify: <code>src/logodev_mcp/config.py</code> (inside <code>CONFIG-FIELDS</code> and <code>CONFIG-FROM-ENV</code> sentinels only)
+- Test: <code>tests/test_config.py</code></p>
+<p><strong>Interfaces:</strong>
+- Produces: <code>ProjectConfig.publishable_key: str | None</code>, <code>ProjectConfig.secret_key: str | None</code>, loaded from <code>LOGODEV_MCP_PUBLISHABLE_KEY</code> / <code>LOGODEV_MCP_SECRET_KEY</code>. (Booleans are derived by callers via <code>bool(config.publishable_key)</code> — we deliberately do <strong>not</strong> add properties, to keep all edits inside the sentinel blocks.)</p>
+<ul>
+<li>[ ] <strong>Step 1: Write the failing test</strong></li>
+</ul>
+<p>Create <code>tests/test_config.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">logodev_mcp.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectConfig</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_keys_default_to_none</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">delenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_PUBLISHABLE_KEY&quot;</span><span class="p">,</span> <span class="n">raising</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">delenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_SECRET_KEY&quot;</span><span class="p">,</span> <span class="n">raising</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">ProjectConfig</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">publishable_key</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">secret_key</span> <span class="ow">is</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_keys_load_from_env</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_PUBLISHABLE_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;pk_live_abc&quot;</span><span class="p">)</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_SECRET_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;sk_live_xyz&quot;</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">ProjectConfig</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">publishable_key</span> <span class="o">==</span> <span class="s2">&quot;pk_live_abc&quot;</span>
+    <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">secret_key</span> <span class="o">==</span> <span class="s2">&quot;sk_live_xyz&quot;</span>
+</code></pre></div>
+<ul>
+<li>[ ] <strong>Step 2: Run test to verify it fails</strong></li>
+</ul>
+<p>Run: <code>uv run pytest tests/test_config.py -v</code>
+Expected: FAIL — <code>AttributeError: 'ProjectConfig' object has no attribute 'publishable_key'</code>.</p>
+<ul>
+<li>[ ] <strong>Step 3: Add the fields and env reads</strong></li>
+</ul>
+<p>In <code>src/logodev_mcp/config.py</code>, inside the <code>CONFIG-FIELDS-START … CONFIG-FIELDS-END</code> block, add:</p>
+<div class="highlight"><pre><span></span><code>    <span class="n">publishable_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">secret_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+<p>In the <code>CONFIG-FROM-ENV-START … CONFIG-FROM-ENV-END</code> block (inside the <code>cls(...)</code> call), add:</p>
+<div class="highlight"><pre><span></span><code>            <span class="n">publishable_key</span><span class="o">=</span><span class="n">env</span><span class="p">(</span><span class="n">_ENV_PREFIX</span><span class="p">,</span> <span class="s2">&quot;PUBLISHABLE_KEY&quot;</span><span class="p">),</span>
+            <span class="n">secret_key</span><span class="o">=</span><span class="n">env</span><span class="p">(</span><span class="n">_ENV_PREFIX</span><span class="p">,</span> <span class="s2">&quot;SECRET_KEY&quot;</span><span class="p">),</span>
+</code></pre></div>
+<p>(<code>env</code> is already imported at the top of the generated <code>config.py</code>.)</p>
+<ul>
+<li>[ ] <strong>Step 4: Run test to verify it passes</strong></li>
+</ul>
+<p>Run: <code>uv run pytest tests/test_config.py -v</code>
+Expected: PASS (both tests).</p>
+<ul>
+<li>[ ] <strong>Step 5: Commit</strong></li>
+</ul>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>src/logodev_mcp/config.py<span class="w"> </span>tests/test_config.py
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: load logo.dev publishable and secret keys from env&quot;</span>
+</code></pre></div>
+<hr />
+<h3 id="task-3-domain-service-lifecycle-clients-error-type">Task 3: Domain Service — lifecycle, clients, error type<a class="headerlink" href="#task-3-domain-service-lifecycle-clients-error-type" title="Permanent link">&para;</a></h3>
+<p><strong>Files:</strong>
+- Modify: <code>src/logodev_mcp/domain.py</code> (replace the placeholder <code>Service</code>)
+- Test: <code>tests/test_domain.py</code></p>
+<p><strong>Interfaces:</strong>
+- Produces:
+  - <code>LogoDevError(Exception)</code> with <code>.message: str</code> and <code>.status: int | None</code>.
+  - <code>Service(config: ProjectConfig | None = None)</code>; <code>async start()</code>, <code>async stop()</code>.
+  - After <code>start()</code>: <code>Service.has_publishable: bool</code>, <code>Service.has_secret: bool</code> reflect the loaded config; <code>self._api</code> / <code>self._img</code> are <code>httpx.AsyncClient | None</code>.
+  - Module constants <code>API_BASE = "https://api.logo.dev"</code>, <code>IMG_BASE = "https://img.logo.dev"</code>.
+- Consumes: <code>ProjectConfig</code> from Task 2.</p>
+<ul>
+<li>[ ] <strong>Step 1: Write the failing test</strong></li>
+</ul>
+<p>Create <code>tests/test_domain.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">logodev_mcp.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">logodev_mcp.domain</span><span class="w"> </span><span class="kn">import</span> <span class="n">API_BASE</span><span class="p">,</span> <span class="n">IMG_BASE</span><span class="p">,</span> <span class="n">LogoDevError</span><span class="p">,</span> <span class="n">Service</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_start_with_both_keys_builds_both_clients</span><span class="p">():</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">ProjectConfig</span><span class="p">(</span><span class="n">publishable_key</span><span class="o">=</span><span class="s2">&quot;pk_x&quot;</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="s2">&quot;sk_y&quot;</span><span class="p">)</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">Service</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">service</span><span class="o">.</span><span class="n">has_publishable</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="n">service</span><span class="o">.</span><span class="n">has_secret</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">_api</span><span class="p">,</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">_img</span><span class="p">,</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">base_url</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">API_BASE</span>
+        <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">_img</span><span class="o">.</span><span class="n">base_url</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">IMG_BASE</span>
+        <span class="k">assert</span> <span class="n">service</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Authorization&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Bearer sk_y&quot;</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_start_with_no_keys_builds_no_clients</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">Service</span><span class="p">(</span><span class="n">ProjectConfig</span><span class="p">())</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">service</span><span class="o">.</span><span class="n">has_publishable</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="k">assert</span> <span class="n">service</span><span class="o">.</span><span class="n">has_secret</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="k">assert</span> <span class="n">service</span><span class="o">.</span><span class="n">_api</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">service</span><span class="o">.</span><span class="n">_img</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_stop_is_idempotent</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">Service</span><span class="p">(</span><span class="n">ProjectConfig</span><span class="p">(</span><span class="n">secret_key</span><span class="o">=</span><span class="s2">&quot;sk_y&quot;</span><span class="p">))</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>  <span class="c1"># second close must not raise</span>
+    <span class="k">assert</span> <span class="n">service</span><span class="o">.</span><span class="n">_api</span> <span class="ow">is</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_logodev_error_carries_message_and_status</span><span class="p">():</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">LogoDevError</span><span class="p">(</span><span class="s2">&quot;nope&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">err</span><span class="o">.</span><span class="n">message</span> <span class="o">==</span> <span class="s2">&quot;nope&quot;</span>
+    <span class="k">assert</span> <span class="n">err</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">404</span>
+    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;nope&quot;</span>
+</code></pre></div>
+<ul>
+<li>[ ] <strong>Step 2: Run test to verify it fails</strong></li>
+</ul>
+<p>Run: <code>uv run pytest tests/test_domain.py -v</code>
+Expected: FAIL — <code>ImportError: cannot import name 'LogoDevError'</code> (and <code>API_BASE</code>).</p>
+<ul>
+<li>[ ] <strong>Step 3: Replace <code>domain.py</code> with the Service skeleton</strong></li>
+</ul>
+<p>Replace the entire body of <code>src/logodev_mcp/domain.py</code> with:</p>
+<div class="highlight"><pre><span></span><code><span class="sd">&quot;&quot;&quot;Domain logic for Logo.dev MCP — a thin async client over the logo.dev API.</span>
+
+<span class="sd">Plain Python only: no FastMCP types here so the logic is unit-testable</span>
+<span class="sd">without a server.  Tool wrappers in ``tools.py`` adapt these methods to</span>
+<span class="sd">MCP (error strings, ``Image`` content).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">logodev_mcp.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectConfig</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">API_BASE</span> <span class="o">=</span> <span class="s2">&quot;https://api.logo.dev&quot;</span>
+<span class="n">IMG_BASE</span> <span class="o">=</span> <span class="s2">&quot;https://img.logo.dev&quot;</span>
+
+<span class="n">_IDENTIFIER_PATHS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="s2">&quot;/</span><span class="si">{ident}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ticker&quot;</span><span class="p">:</span> <span class="s2">&quot;/ticker/</span><span class="si">{ident}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;isin&quot;</span><span class="p">:</span> <span class="s2">&quot;/isin/</span><span class="si">{ident}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;crypto&quot;</span><span class="p">:</span> <span class="s2">&quot;/crypto/</span><span class="si">{ident}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;/name/</span><span class="si">{ident}</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">_FORMATS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="s2">&quot;webp&quot;</span><span class="p">)</span>
+<span class="n">_THEMES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;light&quot;</span><span class="p">,</span> <span class="s2">&quot;dark&quot;</span><span class="p">)</span>
+<span class="n">_FALLBACKS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;monogram&quot;</span><span class="p">,</span> <span class="s2">&quot;404&quot;</span><span class="p">)</span>
+<span class="n">_STRATEGIES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;suggest&quot;</span><span class="p">,</span> <span class="s2">&quot;match&quot;</span><span class="p">)</span>
+
+<span class="n">_TIMEOUT</span> <span class="o">=</span> <span class="mf">30.0</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">LogoDevError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A logo.dev request failed validation or returned an error response.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Service</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Async client over the logo.dev REST and image APIs.</span>
+
+<span class="sd">    Pass an explicit :class:`ProjectConfig` for tests; in production the</span>
+<span class="sd">    lifespan constructs ``Service()`` with no args and :meth:`start` loads</span>
+<span class="sd">    config from the environment.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">ProjectConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">:</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_img</span><span class="p">:</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_publishable</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_secret</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load config (if not injected) and build the configured clients.&quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="ow">or</span> <span class="n">ProjectConfig</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_publishable</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">publishable_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_secret</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">secret_key</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_secret</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_api</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span>
+                <span class="n">base_url</span><span class="o">=</span><span class="n">API_BASE</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">secret_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">_TIMEOUT</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_publishable</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_img</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">base_url</span><span class="o">=</span><span class="n">IMG_BASE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">_TIMEOUT</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;logo.dev service started (publishable=</span><span class="si">%s</span><span class="s2">, secret=</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">has_publishable</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">has_secret</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close any open clients.  Safe to call more than once.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">client</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_img</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">client</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">aclose</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_api</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_img</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># --- internal helpers (filled in by later tasks) ---</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_raise_for_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resp</span><span class="p">:</span> <span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">subject</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Map an error response to a :class:`LogoDevError`; no-op on success.&quot;&quot;&quot;</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="o">&lt;</span> <span class="mi">400</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">401</span><span class="p">,</span> <span class="mi">403</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span>
+                <span class="s2">&quot;Authentication or plan-tier problem — check your &quot;</span>
+                <span class="s2">&quot;LOGODEV_MCP_SECRET_KEY and that your plan includes this &quot;</span>
+                <span class="s2">&quot;endpoint.&quot;</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="n">code</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No result found for </span><span class="si">{</span><span class="n">subject</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">429</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span>
+                <span class="s2">&quot;logo.dev rate limit reached — retry later.&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">429</span>
+            <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;logo.dev error: </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">code</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">client</span><span class="p">:</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">subject</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;GET with transport-error translation and status mapping.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">TimeoutException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span><span class="s2">&quot;logo.dev did not respond in time.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">TransportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span><span class="s2">&quot;Cannot reach logo.dev.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raise_for_status</span><span class="p">(</span><span class="n">resp</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">resp</span>
+</code></pre></div>
+<ul>
+<li>[ ] <strong>Step 4: Run test to verify it passes</strong></li>
+</ul>
+<p>Run: <code>uv run pytest tests/test_domain.py -v</code>
+Expected: PASS (4 tests). The <code>_server_deps.py</code> lifespan still calls <code>Service()</code> with no args — unchanged and compatible.</p>
+<ul>
+<li>[ ] <strong>Step 5: Verify the placeholder smoke test still passes or is updated</strong></li>
+</ul>
+<p>Run: <code>uv run pytest -q</code>
+Expected: PASS. If a generated <code>tests/test_smoke.py</code> asserted on the placeholder <code>ping</code> tool / <code>Service.ping</code>, and <code>ping</code> no longer exists, update that test to call <code>Service.start</code>/<code>stop</code> (or delete the <code>ping</code>-specific assertion) rather than leaving it broken — the removed placeholder's tests get rewritten to the new state.</p>
+<ul>
+<li>[ ] <strong>Step 6: Commit</strong></li>
+</ul>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>src/logodev_mcp/domain.py<span class="w"> </span>tests/test_domain.py<span class="w"> </span>tests/test_smoke.py
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: logo.dev Service lifecycle, clients, and error type&quot;</span>
+</code></pre></div>
+<hr />
+<h3 id="task-4-domain-get_logo">Task 4: Domain — <code>get_logo</code><a class="headerlink" href="#task-4-domain-get_logo" title="Permanent link">&para;</a></h3>
+<p><strong>Files:</strong>
+- Modify: <code>src/logodev_mcp/domain.py</code> (add <code>get_logo</code> method)
+- Test: <code>tests/test_domain.py</code></p>
+<p><strong>Interfaces:</strong>
+- Produces: <code>async Service.get_logo(identifier: str, *, identifier_type="domain", size=128, image_format="png", theme="auto", greyscale=False, retina=False, fallback="monogram", url_only=False) -&gt; tuple[str, bytes | None]</code>. Returns <code>(url, bytes)</code>; <code>bytes is None</code> when <code>url_only=True</code>. Raises <code>LogoDevError</code> on bad params, missing publishable key, or HTTP error.
+- Consumes: <code>_get</code>, <code>_raise_for_status</code>, constants from Task 3.</p>
+<ul>
+<li>[ ] <strong>Step 1: Write the failing tests</strong></li>
+</ul>
+<p>Append to <code>tests/test_domain.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">respx</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_img_service</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Service</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Service</span><span class="p">(</span><span class="n">ProjectConfig</span><span class="p">(</span><span class="n">publishable_key</span><span class="o">=</span><span class="s2">&quot;pk_test&quot;</span><span class="p">))</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_get_logo_url_only_makes_no_request</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">_img_service</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">respx</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
+            <span class="n">route</span> <span class="o">=</span> <span class="n">respx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url__startswith</span><span class="o">=</span><span class="n">IMG_BASE</span><span class="p">)</span><span class="o">.</span><span class="n">mock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">url</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">get_logo</span><span class="p">(</span><span class="s2">&quot;nike.com&quot;</span><span class="p">,</span> <span class="n">url_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">IMG_BASE</span><span class="si">}</span><span class="s2">/nike.com&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="s2">&quot;token=pk_test&quot;</span> <span class="ow">in</span> <span class="n">url</span>
+        <span class="k">assert</span> <span class="s2">&quot;format=png&quot;</span> <span class="ow">in</span> <span class="n">url</span>
+        <span class="k">assert</span> <span class="n">route</span><span class="o">.</span><span class="n">called</span> <span class="ow">is</span> <span class="kc">False</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_get_logo_fetches_bytes_and_builds_url</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">_img_service</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">respx</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
+            <span class="n">respx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">IMG_BASE</span><span class="si">}</span><span class="s2">/ticker/AAPL&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x89</span><span class="s2">PNG...&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">url</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">get_logo</span><span class="p">(</span>
+                <span class="s2">&quot;AAPL&quot;</span><span class="p">,</span> <span class="n">identifier_type</span><span class="o">=</span><span class="s2">&quot;ticker&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="s2">&quot;dark&quot;</span><span class="p">,</span>
+                <span class="n">greyscale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">retina</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x89</span><span class="s2">PNG...&quot;</span>
+        <span class="k">assert</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">IMG_BASE</span><span class="si">}</span><span class="s2">/ticker/AAPL&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="s2">&quot;size=256&quot;</span> <span class="ow">in</span> <span class="n">url</span>
+        <span class="k">assert</span> <span class="s2">&quot;theme=dark&quot;</span> <span class="ow">in</span> <span class="n">url</span>
+        <span class="k">assert</span> <span class="s2">&quot;greyscale=true&quot;</span> <span class="ow">in</span> <span class="n">url</span>
+        <span class="k">assert</span> <span class="s2">&quot;retina=true&quot;</span> <span class="ow">in</span> <span class="n">url</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_get_logo_omits_default_params</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">_img_service</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">url</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">get_logo</span><span class="p">(</span><span class="s2">&quot;nike.com&quot;</span><span class="p">,</span> <span class="n">url_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># defaults (size=128, theme=auto, fallback=monogram) are omitted;</span>
+        <span class="c1"># format is always sent (API default differs from ours).</span>
+        <span class="k">assert</span> <span class="s2">&quot;size=&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">url</span>
+        <span class="k">assert</span> <span class="s2">&quot;theme=&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">url</span>
+        <span class="k">assert</span> <span class="s2">&quot;fallback=&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">url</span>
+        <span class="k">assert</span> <span class="s2">&quot;format=png&quot;</span> <span class="ow">in</span> <span class="n">url</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span>
+    <span class="s2">&quot;kwargs&quot;</span><span class="p">,</span>
+    <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;identifier_type&quot;</span><span class="p">:</span> <span class="s2">&quot;bogus&quot;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">801</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;image_format&quot;</span><span class="p">:</span> <span class="s2">&quot;gif&quot;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;theme&quot;</span><span class="p">:</span> <span class="s2">&quot;neon&quot;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;fallback&quot;</span><span class="p">:</span> <span class="s2">&quot;blank&quot;</span><span class="p">},</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_get_logo_rejects_bad_params_before_http</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">_img_service</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">respx</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
+            <span class="n">route</span> <span class="o">=</span> <span class="n">respx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url__startswith</span><span class="o">=</span><span class="n">IMG_BASE</span><span class="p">)</span><span class="o">.</span><span class="n">mock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">LogoDevError</span><span class="p">):</span>
+                <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">get_logo</span><span class="p">(</span><span class="s2">&quot;nike.com&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">route</span><span class="o">.</span><span class="n">called</span> <span class="ow">is</span> <span class="kc">False</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_get_logo_without_publishable_key_raises</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">Service</span><span class="p">(</span><span class="n">ProjectConfig</span><span class="p">())</span>  <span class="c1"># no keys</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">LogoDevError</span><span class="p">):</span>
+            <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">get_logo</span><span class="p">(</span><span class="s2">&quot;nike.com&quot;</span><span class="p">,</span> <span class="n">url_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_get_logo_maps_404</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">_img_service</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">respx</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
+            <span class="n">respx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">IMG_BASE</span><span class="si">}</span><span class="s2">/unknown.example&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">LogoDevError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">get_logo</span><span class="p">(</span><span class="s2">&quot;unknown.example&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">exc</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">404</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+</code></pre></div>
+<ul>
+<li>[ ] <strong>Step 2: Run tests to verify they fail</strong></li>
+</ul>
+<p>Run: <code>uv run pytest tests/test_domain.py -k get_logo -v</code>
+Expected: FAIL — <code>AttributeError: 'Service' object has no attribute 'get_logo'</code>.</p>
+<ul>
+<li>[ ] <strong>Step 3: Implement <code>get_logo</code></strong></li>
+</ul>
+<p>Add to the <code>Service</code> class in <code>src/logodev_mcp/domain.py</code> (after <code>_get</code>):</p>
+<div class="highlight"><pre><span></span><code>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_logo</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">identifier_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;domain&quot;</span><span class="p">,</span>
+        <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="n">image_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+        <span class="n">theme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+        <span class="n">greyscale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">retina</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">fallback</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;monogram&quot;</span><span class="p">,</span>
+        <span class="n">url_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the img.logo.dev URL and (unless ``url_only``) fetch the bytes.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_publishable</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_img</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_publishable</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span>
+                    <span class="s2">&quot;Logo API not configured — set LOGODEV_MCP_PUBLISHABLE_KEY.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="n">identifier_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_IDENTIFIER_PATHS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid identifier_type </span><span class="si">{</span><span class="n">identifier_type</span><span class="si">!r}</span><span class="s2">; expected one of &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">_IDENTIFIER_PATHS</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">size</span> <span class="o">&lt;=</span> <span class="mi">800</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span><span class="s2">&quot;size must be between 1 and 800.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">image_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_FORMATS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid format </span><span class="si">{</span><span class="n">image_format</span><span class="si">!r}</span><span class="s2">; expected one of </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">_FORMATS</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">theme</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_THEMES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid theme </span><span class="si">{</span><span class="n">theme</span><span class="si">!r}</span><span class="s2">; expected one of </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">_THEMES</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">fallback</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_FALLBACKS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid fallback </span><span class="si">{</span><span class="n">fallback</span><span class="si">!r}</span><span class="s2">; expected one of </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">_FALLBACKS</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">_IDENTIFIER_PATHS</span><span class="p">[</span><span class="n">identifier_type</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ident</span><span class="o">=</span><span class="n">identifier</span><span class="p">)</span>
+        <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">publishable_key</span><span class="p">,</span>
+            <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="n">image_format</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="o">!=</span> <span class="mi">128</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="k">if</span> <span class="n">theme</span> <span class="o">!=</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;theme&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">theme</span>
+        <span class="k">if</span> <span class="n">greyscale</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;greyscale&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;true&quot;</span>
+        <span class="k">if</span> <span class="n">retina</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;retina&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;true&quot;</span>
+        <span class="k">if</span> <span class="n">fallback</span> <span class="o">!=</span> <span class="s2">&quot;monogram&quot;</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;fallback&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fallback</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">httpx</span><span class="o">.</span><span class="n">URL</span><span class="p">(</span><span class="n">IMG_BASE</span> <span class="o">+</span> <span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">url_only</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">url</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_img</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="n">identifier</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">url</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">content</span>
+</code></pre></div>
+<ul>
+<li>[ ] <strong>Step 4: Run tests to verify they pass</strong></li>
+</ul>
+<p>Run: <code>uv run pytest tests/test_domain.py -k get_logo -v</code>
+Expected: PASS (all <code>get_logo</code> tests).</p>
+<ul>
+<li>[ ] <strong>Step 5: Commit</strong></li>
+</ul>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>src/logodev_mcp/domain.py<span class="w"> </span>tests/test_domain.py
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: Service.get_logo with validation and URL building&quot;</span>
+</code></pre></div>
+<hr />
+<h3 id="task-5-domain-search_brands-describe_company-get_brand">Task 5: Domain — <code>search_brands</code>, <code>describe_company</code>, <code>get_brand</code><a class="headerlink" href="#task-5-domain-search_brands-describe_company-get_brand" title="Permanent link">&para;</a></h3>
+<p><strong>Files:</strong>
+- Modify: <code>src/logodev_mcp/domain.py</code> (add three REST methods)
+- Test: <code>tests/test_domain.py</code></p>
+<p><strong>Interfaces:</strong>
+- Produces:
+  - <code>async Service.search_brands(query: str, *, strategy="suggest") -&gt; Any</code> → parsed JSON (<code>GET /search?q=…</code>).
+  - <code>async Service.describe_company(domain: str) -&gt; Any</code> → parsed JSON (<code>GET /describe/{domain}</code>).
+  - <code>async Service.get_brand(domain: str) -&gt; Any</code> → parsed JSON (<code>GET /brand/{domain}</code>).
+  - Each raises <code>LogoDevError</code> when the secret key is absent, on invalid params, or on HTTP error.
+- Consumes: <code>_get</code>, <code>_STRATEGIES</code>, <code>self._api</code> from Task 3.</p>
+<ul>
+<li>[ ] <strong>Step 1: Write the failing tests</strong></li>
+</ul>
+<p>Append to <code>tests/test_domain.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_api_service</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Service</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Service</span><span class="p">(</span><span class="n">ProjectConfig</span><span class="p">(</span><span class="n">secret_key</span><span class="o">=</span><span class="s2">&quot;sk_test&quot;</span><span class="p">))</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_search_brands_sends_query_and_parses_json</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">_api_service</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">respx</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
+            <span class="n">route</span> <span class="o">=</span> <span class="n">respx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">API_BASE</span><span class="si">}</span><span class="s2">/search&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">(</span>
+                    <span class="mi">200</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Nike&quot;</span><span class="p">,</span> <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="s2">&quot;nike.com&quot;</span><span class="p">}]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">search_brands</span><span class="p">(</span><span class="s2">&quot;nike&quot;</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;match&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Nike&quot;</span><span class="p">,</span> <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="s2">&quot;nike.com&quot;</span><span class="p">}]</span>
+        <span class="n">sent</span> <span class="o">=</span> <span class="n">route</span><span class="o">.</span><span class="n">calls</span><span class="o">.</span><span class="n">last</span><span class="o">.</span><span class="n">request</span>
+        <span class="k">assert</span> <span class="n">sent</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;q&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;nike&quot;</span>
+        <span class="k">assert</span> <span class="n">sent</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;match&quot;</span>
+        <span class="k">assert</span> <span class="n">sent</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Authorization&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Bearer sk_test&quot;</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_search_brands_omits_default_strategy</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">_api_service</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">respx</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
+            <span class="n">route</span> <span class="o">=</span> <span class="n">respx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">API_BASE</span><span class="si">}</span><span class="s2">/search&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">[])</span>
+            <span class="p">)</span>
+            <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">search_brands</span><span class="p">(</span><span class="s2">&quot;nike&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="s2">&quot;strategy&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">route</span><span class="o">.</span><span class="n">calls</span><span class="o">.</span><span class="n">last</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">params</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_search_brands_rejects_bad_strategy_before_http</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">_api_service</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">respx</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
+            <span class="n">route</span> <span class="o">=</span> <span class="n">respx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">API_BASE</span><span class="si">}</span><span class="s2">/search&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">[])</span>
+            <span class="p">)</span>
+            <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">LogoDevError</span><span class="p">):</span>
+                <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">search_brands</span><span class="p">(</span><span class="s2">&quot;nike&quot;</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;fuzzy&quot;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">route</span><span class="o">.</span><span class="n">called</span> <span class="ow">is</span> <span class="kc">False</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_describe_company_hits_describe_path</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">_api_service</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">respx</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
+            <span class="n">respx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">API_BASE</span><span class="si">}</span><span class="s2">/describe/nike.com&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Nike&quot;</span><span class="p">})</span>
+            <span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">describe_company</span><span class="p">(</span><span class="s2">&quot;nike.com&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Nike&quot;</span><span class="p">}</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_get_brand_hits_brand_path</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">_api_service</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">respx</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
+            <span class="n">respx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">API_BASE</span><span class="si">}</span><span class="s2">/brand/nike.com&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;colors&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;#111&quot;</span><span class="p">]})</span>
+            <span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">get_brand</span><span class="p">(</span><span class="s2">&quot;nike.com&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;colors&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;#111&quot;</span><span class="p">]}</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_rest_methods_map_401</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">_api_service</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">respx</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
+            <span class="n">respx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">API_BASE</span><span class="si">}</span><span class="s2">/brand/nike.com&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mock</span><span class="p">(</span>
+                <span class="n">return_value</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">(</span><span class="mi">401</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">LogoDevError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">get_brand</span><span class="p">(</span><span class="s2">&quot;nike.com&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">exc</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">401</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_rest_methods_require_secret_key</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">Service</span><span class="p">(</span><span class="n">ProjectConfig</span><span class="p">())</span>  <span class="c1"># no keys</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">call</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="n">service</span><span class="o">.</span><span class="n">search_brands</span><span class="p">(</span><span class="s2">&quot;nike&quot;</span><span class="p">),</span>
+            <span class="n">service</span><span class="o">.</span><span class="n">describe_company</span><span class="p">(</span><span class="s2">&quot;nike.com&quot;</span><span class="p">),</span>
+            <span class="n">service</span><span class="o">.</span><span class="n">get_brand</span><span class="p">(</span><span class="s2">&quot;nike.com&quot;</span><span class="p">),</span>
+        <span class="p">):</span>
+            <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">LogoDevError</span><span class="p">):</span>
+                <span class="k">await</span> <span class="n">call</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_search_brands_maps_timeout</span><span class="p">():</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">_api_service</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">respx</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
+            <span class="n">respx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">API_BASE</span><span class="si">}</span><span class="s2">/search&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mock</span><span class="p">(</span>
+                <span class="n">side_effect</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">ConnectTimeout</span><span class="p">(</span><span class="s2">&quot;slow&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">LogoDevError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">search_brands</span><span class="p">(</span><span class="s2">&quot;nike&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="s2">&quot;did not respond&quot;</span> <span class="ow">in</span> <span class="n">exc</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">message</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+</code></pre></div>
+<ul>
+<li>[ ] <strong>Step 2: Run tests to verify they fail</strong></li>
+</ul>
+<p>Run: <code>uv run pytest tests/test_domain.py -k "search_brands or describe or brand or rest_methods" -v</code>
+Expected: FAIL — <code>AttributeError: 'Service' object has no attribute 'search_brands'</code>.</p>
+<ul>
+<li>[ ] <strong>Step 3: Implement the three REST methods</strong></li>
+</ul>
+<p>Add to the <code>Service</code> class in <code>src/logodev_mcp/domain.py</code> (after <code>get_logo</code>):</p>
+<div class="highlight"><pre><span></span><code>    <span class="k">def</span><span class="w"> </span><span class="nf">_require_secret</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the api client, or raise if the secret key is unconfigured.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_secret</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span>
+                <span class="s2">&quot;This endpoint needs a secret key — set LOGODEV_MCP_SECRET_KEY &quot;</span>
+                <span class="s2">&quot;(Search/Describe/Brand require a paid plan).&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search_brands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;suggest&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a brand/company name to candidate domains.&quot;&quot;&quot;</span>
+        <span class="n">api</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_secret</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">strategy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_STRATEGIES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid strategy </span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">; expected one of </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">_STRATEGIES</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span><span class="s2">&quot;query must not be empty.&quot;</span><span class="p">)</span>
+        <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="n">query</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">strategy</span> <span class="o">!=</span> <span class="s2">&quot;suggest&quot;</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">strategy</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="s2">&quot;/search&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">describe_company</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return structured company data for a domain.&quot;&quot;&quot;</span>
+        <span class="n">api</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_secret</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">domain</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span><span class="s2">&quot;domain must not be empty.&quot;</span><span class="p">)</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/describe/</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_brand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the full brand profile for a domain.&quot;&quot;&quot;</span>
+        <span class="n">api</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_secret</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">domain</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">LogoDevError</span><span class="p">(</span><span class="s2">&quot;domain must not be empty.&quot;</span><span class="p">)</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/brand/</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</code></pre></div>
+<ul>
+<li>[ ] <strong>Step 4: Run tests to verify they pass</strong></li>
+</ul>
+<p>Run: <code>uv run pytest tests/test_domain.py -v</code>
+Expected: PASS (all domain tests, including Tasks 3–5).</p>
+<ul>
+<li>[ ] <strong>Step 5: Commit</strong></li>
+</ul>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>src/logodev_mcp/domain.py<span class="w"> </span>tests/test_domain.py
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: Service search_brands, describe_company, get_brand&quot;</span>
+</code></pre></div>
+<hr />
+<h3 id="task-6-tool-registration-conditional-with-image-and-error-mapping">Task 6: Tool registration — conditional, with Image and error mapping<a class="headerlink" href="#task-6-tool-registration-conditional-with-image-and-error-mapping" title="Permanent link">&para;</a></h3>
+<p><strong>Files:</strong>
+- Modify: <code>src/logodev_mcp/tools.py</code> (replace placeholder <code>register_tools</code>)
+- Test: <code>tests/test_tools.py</code></p>
+<p><strong>Interfaces:</strong>
+- Consumes: <code>Service</code> methods (Tasks 4–5), <code>get_service</code> dependency (from generated <code>_server_deps.py</code>), <code>ProjectConfig</code> (Task 2), <code>make_server</code> (generated <code>server.py</code>).
+- Produces: <code>register_tools(mcp: FastMCP, config: ProjectConfig | None = None) -&gt; None</code> registering <code>get_logo</code> only when a publishable key is set, and <code>search_brands</code> / <code>describe_company</code> / <code>get_brand</code> only when a secret key is set. Each tool returns JSON-serialisable data or, on <code>LogoDevError</code>, the error message string; <code>get_logo</code> returns <code>[url, Image]</code> (or just the URL string when <code>url_only=True</code>).</p>
+<ul>
+<li>[ ] <strong>Step 1: Write the failing tests</strong></li>
+</ul>
+<p>Create <code>tests/test_tools.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">respx</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp.utilities.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">logodev_mcp.domain</span><span class="w"> </span><span class="kn">import</span> <span class="n">API_BASE</span><span class="p">,</span> <span class="n">IMG_BASE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">logodev_mcp.server</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_server</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_tool_names</span><span class="p">(</span><span class="n">mcp</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">Client</span><span class="p">(</span><span class="n">mcp</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">t</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">list_tools</span><span class="p">()}</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_only_logo_tool_with_publishable_only</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_PUBLISHABLE_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;pk_x&quot;</span><span class="p">)</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">delenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_SECRET_KEY&quot;</span><span class="p">,</span> <span class="n">raising</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_tool_names</span><span class="p">(</span><span class="n">make_server</span><span class="p">())</span>
+    <span class="k">assert</span> <span class="s2">&quot;get_logo&quot;</span> <span class="ow">in</span> <span class="n">names</span>
+    <span class="k">assert</span> <span class="s2">&quot;search_brands&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span>
+    <span class="k">assert</span> <span class="s2">&quot;get_brand&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_only_rest_tools_with_secret_only</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">delenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_PUBLISHABLE_KEY&quot;</span><span class="p">,</span> <span class="n">raising</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_SECRET_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;sk_y&quot;</span><span class="p">)</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_tool_names</span><span class="p">(</span><span class="n">make_server</span><span class="p">())</span>
+    <span class="k">assert</span> <span class="s2">&quot;get_logo&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span>
+    <span class="k">assert</span> <span class="p">{</span><span class="s2">&quot;search_brands&quot;</span><span class="p">,</span> <span class="s2">&quot;describe_company&quot;</span><span class="p">,</span> <span class="s2">&quot;get_brand&quot;</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="n">names</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_no_api_tools_without_keys</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">delenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_PUBLISHABLE_KEY&quot;</span><span class="p">,</span> <span class="n">raising</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">delenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_SECRET_KEY&quot;</span><span class="p">,</span> <span class="n">raising</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_tool_names</span><span class="p">(</span><span class="n">make_server</span><span class="p">())</span>
+    <span class="k">assert</span> <span class="p">{</span><span class="s2">&quot;get_logo&quot;</span><span class="p">,</span> <span class="s2">&quot;search_brands&quot;</span><span class="p">,</span> <span class="s2">&quot;describe_company&quot;</span><span class="p">,</span> <span class="s2">&quot;get_brand&quot;</span><span class="p">}</span><span class="o">.</span><span class="n">isdisjoint</span><span class="p">(</span>
+        <span class="n">names</span>
+    <span class="p">)</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_get_logo_tool_returns_url_and_image</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_PUBLISHABLE_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;pk_x&quot;</span><span class="p">)</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">delenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_SECRET_KEY&quot;</span><span class="p">,</span> <span class="n">raising</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">mcp</span> <span class="o">=</span> <span class="n">make_server</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">respx</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
+        <span class="n">respx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">IMG_BASE</span><span class="si">}</span><span class="s2">/nike.com&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mock</span><span class="p">(</span>
+            <span class="n">return_value</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x89</span><span class="s2">PNG&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">Client</span><span class="p">(</span><span class="n">mcp</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">call_tool</span><span class="p">(</span><span class="s2">&quot;get_logo&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;identifier&quot;</span><span class="p">:</span> <span class="s2">&quot;nike.com&quot;</span><span class="p">})</span>
+    <span class="n">blocks</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">content</span>
+    <span class="k">assert</span> <span class="nb">any</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;text&quot;</span> <span class="ow">and</span> <span class="s2">&quot;img.logo.dev&quot;</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">text</span>
+               <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">any</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;image&quot;</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">)</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">asyncio</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_get_brand_tool_maps_error_to_message</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">delenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_PUBLISHABLE_KEY&quot;</span><span class="p">,</span> <span class="n">raising</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setenv</span><span class="p">(</span><span class="s2">&quot;LOGODEV_MCP_SECRET_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;sk_y&quot;</span><span class="p">)</span>
+    <span class="n">mcp</span> <span class="o">=</span> <span class="n">make_server</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">respx</span><span class="o">.</span><span class="n">mock</span><span class="p">:</span>
+        <span class="n">respx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">API_BASE</span><span class="si">}</span><span class="s2">/brand/nike.com&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mock</span><span class="p">(</span>
+            <span class="n">return_value</span><span class="o">=</span><span class="n">httpx</span><span class="o">.</span><span class="n">Response</span><span class="p">(</span><span class="mi">401</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">Client</span><span class="p">(</span><span class="n">mcp</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">call_tool</span><span class="p">(</span><span class="s2">&quot;get_brand&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="s2">&quot;nike.com&quot;</span><span class="p">})</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">content</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;text&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="s2">&quot;plan&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;secret&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</code></pre></div>
+<ul>
+<li>[ ] <strong>Step 2: Run tests to verify they fail</strong></li>
+</ul>
+<p>Run: <code>uv run pytest tests/test_tools.py -v</code>
+Expected: FAIL — all four API tools are absent (placeholder <code>ping</code> is still the only tool), so the registration assertions fail.</p>
+<ul>
+<li>[ ] <strong>Step 3: Replace <code>register_tools</code></strong></li>
+</ul>
+<p>Replace the body of <code>src/logodev_mcp/tools.py</code> with:</p>
+<div class="highlight"><pre><span></span><code><span class="sd">&quot;&quot;&quot;Tool registrations for Logo.dev MCP.</span>
+
+<span class="sd">See FastMCP tool docs: https://gofastmcp.com/servers/tools</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastMCP</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">Depends</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp.utilities.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">logodev_mcp._server_deps</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_service</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">logodev_mcp.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">logodev_mcp.domain</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogoDevError</span><span class="p">,</span> <span class="n">Service</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">_IMAGE_FORMATS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;jpg&quot;</span><span class="p">:</span> <span class="s2">&quot;jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="s2">&quot;webp&quot;</span><span class="p">:</span> <span class="s2">&quot;webp&quot;</span><span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">register_tools</span><span class="p">(</span><span class="n">mcp</span><span class="p">:</span> <span class="n">FastMCP</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">ProjectConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Register logo.dev tools, gated by which API keys are configured.&quot;&quot;&quot;</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="n">ProjectConfig</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">publishable_key</span><span class="p">:</span>
+
+        <span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span><span class="p">(</span><span class="n">annotations</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;readOnlyHint&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_logo</span><span class="p">(</span>
+            <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">identifier_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;domain&quot;</span><span class="p">,</span>
+            <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
+            <span class="n">image_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="n">theme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+            <span class="n">greyscale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">retina</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">fallback</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;monogram&quot;</span><span class="p">,</span>
+            <span class="n">url_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">service</span><span class="p">:</span> <span class="n">Service</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_service</span><span class="p">),</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Fetch a company logo from logo.dev.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                identifier: Company identifier — a domain (``nike.com``), stock</span>
+<span class="sd">                    ticker (``AAPL``), ISIN (``US0378331005``), crypto symbol</span>
+<span class="sd">                    (``BTC``), or brand name, depending on ``identifier_type``.</span>
+<span class="sd">                identifier_type: One of ``domain`` (default), ``ticker``,</span>
+<span class="sd">                    ``isin``, ``crypto``, ``name``.</span>
+<span class="sd">                size: Pixel size, 1–800 (default 128).</span>
+<span class="sd">                image_format: ``png`` (default), ``jpg``, or ``webp``.</span>
+<span class="sd">                theme: ``auto`` (default), ``light``, or ``dark``.</span>
+<span class="sd">                greyscale: Render in greyscale.</span>
+<span class="sd">                retina: Request a 2× retina asset.</span>
+<span class="sd">                fallback: ``monogram`` (default) renders a placeholder when no</span>
+<span class="sd">                    logo exists; ``404`` returns an error instead.</span>
+<span class="sd">                url_only: Return only the image URL without fetching the bytes.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                The image URL plus the logo image, or just the URL when</span>
+<span class="sd">                ``url_only`` is true.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">url</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">get_logo</span><span class="p">(</span>
+                    <span class="n">identifier</span><span class="p">,</span>
+                    <span class="n">identifier_type</span><span class="o">=</span><span class="n">identifier_type</span><span class="p">,</span>
+                    <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+                    <span class="n">image_format</span><span class="o">=</span><span class="n">image_format</span><span class="p">,</span>
+                    <span class="n">theme</span><span class="o">=</span><span class="n">theme</span><span class="p">,</span>
+                    <span class="n">greyscale</span><span class="o">=</span><span class="n">greyscale</span><span class="p">,</span>
+                    <span class="n">retina</span><span class="o">=</span><span class="n">retina</span><span class="p">,</span>
+                    <span class="n">fallback</span><span class="o">=</span><span class="n">fallback</span><span class="p">,</span>
+                    <span class="n">url_only</span><span class="o">=</span><span class="n">url_only</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="n">LogoDevError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">exc</span><span class="o">.</span><span class="n">message</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">url</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">url</span><span class="p">,</span> <span class="n">Image</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">_IMAGE_FORMATS</span><span class="p">[</span><span class="n">image_format</span><span class="p">])]</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">secret_key</span><span class="p">:</span>
+
+        <span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span><span class="p">(</span><span class="n">annotations</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;readOnlyHint&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search_brands</span><span class="p">(</span>
+            <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">strategy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;suggest&quot;</span><span class="p">,</span>
+            <span class="n">service</span><span class="p">:</span> <span class="n">Service</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_service</span><span class="p">),</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Resolve a brand or company name to candidate domains.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                query: The brand/company name to look up.</span>
+<span class="sd">                strategy: ``suggest`` (default, typeahead) or ``match``.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                A JSON array of candidate brands (name, domain, logo URL).</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">search_brands</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">))</span>
+            <span class="k">except</span> <span class="n">LogoDevError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">exc</span><span class="o">.</span><span class="n">message</span>
+
+        <span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span><span class="p">(</span><span class="n">annotations</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;readOnlyHint&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">describe_company</span><span class="p">(</span>
+            <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">service</span><span class="p">:</span> <span class="n">Service</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_service</span><span class="p">),</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Return structured company data for a domain.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                domain: The company domain (e.g. ``nike.com``).</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                A JSON object with name, description, colors, and socials.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">describe_company</span><span class="p">(</span><span class="n">domain</span><span class="p">))</span>
+            <span class="k">except</span> <span class="n">LogoDevError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">exc</span><span class="o">.</span><span class="n">message</span>
+
+        <span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span><span class="p">(</span><span class="n">annotations</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;readOnlyHint&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_brand</span><span class="p">(</span>
+            <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">service</span><span class="p">:</span> <span class="n">Service</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_service</span><span class="p">),</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Return the full brand profile for a domain.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                domain: The company domain (e.g. ``nike.com``).</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                A JSON object with logo, brandmark, banners, colors, and</span>
+<span class="sd">                description — a richer superset of ``describe_company``.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="k">await</span> <span class="n">service</span><span class="o">.</span><span class="n">get_brand</span><span class="p">(</span><span class="n">domain</span><span class="p">))</span>
+            <span class="k">except</span> <span class="n">LogoDevError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">exc</span><span class="o">.</span><span class="n">message</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">publishable_key</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">secret_key</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;No logo.dev API keys configured — no API tools registered. &quot;</span>
+            <span class="s2">&quot;Set LOGODEV_MCP_PUBLISHABLE_KEY (Logo) and/or &quot;</span>
+            <span class="s2">&quot;LOGODEV_MCP_SECRET_KEY (Search/Describe/Brand).&quot;</span>
+        <span class="p">)</span>
+</code></pre></div>
+<ul>
+<li>[ ] <strong>Step 4: Run tests to verify they pass</strong></li>
+</ul>
+<p>Run: <code>uv run pytest tests/test_tools.py -v</code>
+Expected: PASS (5 tests). If the <code>result.content</code> block attribute names differ in the installed FastMCP version, adjust the assertions to match (<code>uv run python -c "import fastmcp, inspect"</code> and inspect a real <code>CallToolResult</code>) — the behavior (a text block with the URL + an image block) is the contract.</p>
+<ul>
+<li>[ ] <strong>Step 5: Run the full suite</strong></li>
+</ul>
+<p>Run: <code>uv run pytest -q &amp;&amp; uv run ruff check . &amp;&amp; uv run mypy src</code>
+Expected: all PASS / clean.</p>
+<ul>
+<li>[ ] <strong>Step 6: Commit</strong></li>
+</ul>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>src/logodev_mcp/tools.py<span class="w"> </span>tests/test_tools.py
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: register logo.dev tools gated by configured API keys&quot;</span>
+</code></pre></div>
+<hr />
+<h3 id="task-7-server-instructions-docs-and-final-verification">Task 7: Server instructions, docs, and final verification<a class="headerlink" href="#task-7-server-instructions-docs-and-final-verification" title="Permanent link">&para;</a></h3>
+<p><strong>Files:</strong>
+- Modify: <code>src/logodev_mcp/server.py</code> (only the <code>domain_line</code> / instructions text if it still reads the placeholder — inside template wiring; otherwise skip)
+- Modify: <code>README.md</code> (inside <code>DOMAIN-START … DOMAIN-END</code> markers), <code>.env.example</code>
+- Modify: <code>CLAUDE.md</code> (inside its <code>DOMAIN-START … DOMAIN-END</code> markers) — describe the four tools and two keys</p>
+<ul>
+<li>[ ] <strong>Step 1: Document the env vars</strong></li>
+</ul>
+<p>In <code>.env.example</code>, add (near the other commented vars):</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># logo.dev publishable key (pk_…) — enables the get_logo tool</span>
+<span class="c1"># LOGODEV_MCP_PUBLISHABLE_KEY=pk_live_xxx</span>
+<span class="c1"># logo.dev secret key (sk_…) — enables search_brands / describe_company / get_brand</span>
+<span class="c1"># LOGODEV_MCP_SECRET_KEY=sk_live_xxx</span>
+</code></pre></div>
+<ul>
+<li>[ ] <strong>Step 2: Fill the README and CLAUDE.md domain blocks</strong></li>
+</ul>
+<p>In <code>README.md</code>, inside the <code>&lt;!-- DOMAIN-START --&gt;</code> / <code>&lt;!-- DOMAIN-END --&gt;</code> block, write a short overview: the four tools, which key each needs, and the graceful-degradation behavior. In <code>CLAUDE.md</code>, inside its <code>DOMAIN-START</code>/<code>DOMAIN-END</code> markers, note the domain/tools/error-string convention and the "domain.py stays FastMCP-free" rule so future sessions follow it.</p>
+<ul>
+<li>[ ] <strong>Step 3: Confirm the MCP instructions read sensibly</strong></li>
+</ul>
+<p>The generated <code>server.py</code> builds instructions from the copier <code>domain_description</code>. Verify it reads correctly:</p>
+<div class="highlight"><pre><span></span><code>grep<span class="w"> </span>-n<span class="w"> </span><span class="s1">&#39;domain_line\|domain_description&#39;</span><span class="w"> </span>src/logodev_mcp/server.py
+</code></pre></div>
+<p>If the rendered text is the placeholder rather than "Look up company logos and brand data via the logo.dev API.", fix it inside the template wiring (it is set from the copier answer, so it should already be correct).</p>
+<ul>
+<li>[ ] <strong>Step 4: Full verification</strong></li>
+</ul>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-q
+uv<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>.
+uv<span class="w"> </span>run<span class="w"> </span>mypy<span class="w"> </span>src
+uv<span class="w"> </span>run<span class="w"> </span>logodev-mcp<span class="w"> </span>--help
+</code></pre></div>
+<p>Expected: tests PASS, lint/type clean, the CLI entry point prints help. Optionally smoke-run with a real key set to confirm a live call works (not part of the automated suite).</p>
+<ul>
+<li>[ ] <strong>Step 5: Commit</strong></li>
+</ul>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>README.md<span class="w"> </span>CLAUDE.md<span class="w"> </span>.env.example<span class="w"> </span>src/logodev_mcp/server.py
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;docs: document logo.dev tools, keys, and conventions&quot;</span>
+</code></pre></div>
+<hr />
+<h2 id="self-review-notes">Self-Review notes<a class="headerlink" href="#self-review-notes" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Spec coverage:</strong> Logo (Task 4), Search/Describe/Brand (Task 5), two-key config (Task 2), graceful degradation (Task 6 conditional registration + Task 3 client gating), error mapping (Task 3 <code>_raise_for_status</code>/<code>_get</code>, surfaced as strings in Task 6), both-URL-and-image logo output (Task 6 <code>[url, Image]</code>), <code>url_only</code> (Tasks 4/6), TDD with respx and no live network (all tasks). Transaction API and extra CDN paths remain out of scope per the spec.</li>
+<li><strong>Update-safety:</strong> all edits are confined to domain-owned files (<code>config.py</code> sentinels, <code>domain.py</code>, <code>tools.py</code>, <code>tests/</code>) plus sentinel-bracketed <code>README.md</code>/<code>CLAUDE.md</code>; <code>_server_deps.py</code> and <code>server.py</code> core wiring are left untouched, so <code>copier update</code> stays clean.</li>
+<li><strong>Type consistency:</strong> <code>Service</code> method names and signatures in Tasks 4–5 match their call sites in Task 6; <code>get_logo</code> returns <code>tuple[str, bytes | None]</code> consumed as <code>url, data</code>; <code>_IMAGE_FORMATS</code> maps <code>jpg→jpeg</code> for the <code>Image</code> format arg.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/config-wizard/wizard.js" type="module"></script>
+      
+    
+  </body>
+</html>
