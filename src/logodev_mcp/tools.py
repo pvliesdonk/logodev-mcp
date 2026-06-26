@@ -154,8 +154,10 @@ def register_tools(mcp: FastMCP, config: ProjectConfig | None = None) -> None:
                 return exc.message
 
     if not config.publishable_key and not config.secret_key:
+        # Scalar key=value pairs per the project logging standard: each value
+        # names the env var that enables that API's tools.
         logger.warning(
-            "no_api_keys_configured hint=%s",
-            "set LOGODEV_MCP_PUBLISHABLE_KEY (Logo) and/or "
-            "LOGODEV_MCP_SECRET_KEY (Search/Describe/Brand)",
+            "no_api_keys_configured publishable_env=%s secret_env=%s",
+            "LOGODEV_MCP_PUBLISHABLE_KEY",
+            "LOGODEV_MCP_SECRET_KEY",
         )
