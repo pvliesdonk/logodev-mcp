@@ -1,32 +1,127 @@
-"""Domain logic placeholder for Logo.dev MCP.
+"""Domain logic for Logo.dev MCP — a thin async client over the logo.dev API.
 
-Real projects replace :class:`Service` with their actual business
-logic (database client, API wrapper, file indexer, etc.).  Keep
-FastMCP types out of this module — domain code should be plain
-Python, easy to unit-test without a server.
+Plain Python only: no FastMCP types here so the logic is unit-testable
+without a server.  Tool wrappers in ``tools.py`` adapt these methods to
+MCP (error strings, ``Image`` content).
 """
 
 from __future__ import annotations
 
+import logging
+from typing import Any
+
+import httpx
+
+from logodev_mcp.config import ProjectConfig
+
+logger = logging.getLogger(__name__)
+
+API_BASE = "https://api.logo.dev"
+IMG_BASE = "https://img.logo.dev"
+
+_IDENTIFIER_PATHS = {
+    "domain": "/{ident}",
+    "ticker": "/ticker/{ident}",
+    "isin": "/isin/{ident}",
+    "crypto": "/crypto/{ident}",
+    "name": "/name/{ident}",
+}
+_FORMATS = ("jpg", "png", "webp")
+_THEMES = ("auto", "light", "dark")
+_FALLBACKS = ("monogram", "404")
+_STRATEGIES = ("suggest", "match")
+
+_TIMEOUT = 30.0
+
+
+class LogoDevError(Exception):
+    """A logo.dev request failed validation or returned an error response."""
+
+    def __init__(self, message: str, *, status: int | None = None) -> None:
+        super().__init__(message)
+        self.message = message
+        self.status = status
+
 
 class Service:
-    """Placeholder service.  Replace with real domain logic."""
+    """Async client over the logo.dev REST and image APIs.
 
-    def __init__(self) -> None:
-        self._ready = False
+    Pass an explicit :class:`ProjectConfig` for tests; in production the
+    lifespan constructs ``Service()`` with no args and :meth:`start` loads
+    config from the environment.
+    """
+
+    def __init__(self, config: ProjectConfig | None = None) -> None:
+        self._config = config
+        self._api: httpx.AsyncClient | None = None
+        self._img: httpx.AsyncClient | None = None
+        self.has_publishable = False
+        self.has_secret = False
 
     async def start(self) -> None:
-        """Start the service (connect to DB, warm caches, etc.)."""
-        self._ready = True
+        """Load config (if not injected) and build the configured clients."""
+        config = self._config or ProjectConfig.from_env()
+        self._config = config
+        self.has_publishable = bool(config.publishable_key)
+        self.has_secret = bool(config.secret_key)
+
+        if self.has_secret:
+            self._api = httpx.AsyncClient(
+                base_url=API_BASE,
+                headers={"Authorization": f"Bearer {config.secret_key}"},
+                timeout=_TIMEOUT,
+            )
+        if self.has_publishable:
+            self._img = httpx.AsyncClient(base_url=IMG_BASE, timeout=_TIMEOUT)
+
+        logger.info(
+            "service_started publishable=%s secret=%s",
+            self.has_publishable,
+            self.has_secret,
+        )
 
     async def stop(self) -> None:
-        """Stop the service (close connections, flush state, etc.)."""
-        self._ready = False
+        """Close any open clients.  Safe to call more than once."""
+        for client in (self._api, self._img):
+            if client is not None:
+                await client.aclose()
+        self._api = None
+        self._img = None
 
-    async def ping(self) -> str:
-        """Health check."""
-        return "pong" if self._ready else "not ready"
+    # --- internal helpers (filled in by later tasks) ---
 
-    async def status(self) -> dict[str, object]:
-        """Structured status payload."""
-        return {"ready": self._ready}
+    def _raise_for_status(self, resp: httpx.Response, *, subject: str) -> None:
+        """Map an error response to a :class:`LogoDevError`; no-op on success."""
+        code = resp.status_code
+        if code < 400:
+            return
+        if code in (401, 403):
+            raise LogoDevError(
+                "Authentication or plan-tier problem — check your "
+                "LOGODEV_MCP_SECRET_KEY and that your plan includes this "
+                "endpoint.",
+                status=code,
+            )
+        if code == 404:
+            raise LogoDevError(f"No result found for {subject!r}.", status=404)
+        if code == 429:
+            raise LogoDevError("logo.dev rate limit reached — retry later.", status=429)
+        raise LogoDevError(f"logo.dev error: {code} {resp.text}", status=code)
+
+    async def _get(
+        self,
+        client: httpx.AsyncClient,
+        path: str,
+        *,
+        params: dict[str, Any] | None = None,
+        subject: str,
+    ) -> httpx.Response:
+        """GET with transport-error translation and status mapping."""
+        try:
+            resp = await client.get(path, params=params)
+        except httpx.TimeoutException as exc:
+            raise LogoDevError("logo.dev did not respond in time.") from exc
+        except httpx.TransportError as exc:
+            raise LogoDevError("Cannot reach logo.dev.") from exc
+        self._raise_for_status(resp, subject=subject)
+        return resp

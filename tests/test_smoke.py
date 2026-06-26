@@ -50,7 +50,8 @@ async def test_status_resource_reports_ready(client: Client[Any]) -> None:
     assert hasattr(first, "text"), (
         f"expected text resource content, got {type(first).__name__}"
     )
-    assert json.loads(first.text) == {"ready": True}
+    payload = json.loads(first.text)
+    assert payload["ready"] is True
 
 
 async def test_get_server_info_tool_registered(client: Client[Any]) -> None:

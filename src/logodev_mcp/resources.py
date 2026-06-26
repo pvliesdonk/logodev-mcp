@@ -24,4 +24,8 @@ def register_resources(mcp: FastMCP) -> None:
         https://gofastmcp.com/servers/resources#templates for the full
         pattern.
         """
-        return await service.status()
+        return {
+            "ready": True,
+            "has_publishable": service.has_publishable,
+            "has_secret": service.has_secret,
+        }
