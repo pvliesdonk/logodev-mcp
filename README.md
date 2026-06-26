@@ -1,5 +1,7 @@
 # Logo.dev MCP
 
+<!-- mcp-name: io.github.pvliesdonk/logodev-mcp -->
+
 [![CI](https://github.com/pvliesdonk/logodev-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/pvliesdonk/logodev-mcp/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/pvliesdonk/logodev-mcp/graph/badge.svg)](https://codecov.io/gh/pvliesdonk/logodev-mcp) [![PyPI](https://img.shields.io/pypi/v/logodev-mcp)](https://pypi.org/project/logodev-mcp/) [![Python](https://img.shields.io/pypi/pyversions/logodev-mcp)](https://pypi.org/project/logodev-mcp/) [![License](https://img.shields.io/github/license/pvliesdonk/logodev-mcp)](LICENSE) [![Docker](https://img.shields.io/github/v/release/pvliesdonk/logodev-mcp?label=ghcr.io&logo=docker)](https://github.com/pvliesdonk/logodev-mcp/pkgs/container/logodev-mcp) [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://pvliesdonk.github.io/logodev-mcp/) [![llms.txt](https://img.shields.io/badge/llms.txt-available-brightgreen)](https://pvliesdonk.github.io/logodev-mcp/llms.txt) [![Template](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/pvliesdonk/logodev-mcp/main/.copier-answers.yml&query=%24._commit&label=template)](https://github.com/pvliesdonk/fastmcp-server-template)
 
 Look up company logos and brand data via the logo.dev API.

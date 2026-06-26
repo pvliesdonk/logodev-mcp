@@ -17,7 +17,7 @@ maintainer: "pvliesdonk <pvliesdonk@users.noreply.github.com>"
 description: |
   Look up company logos and brand data via the logo.dev API.
 homepage: "https://pvliesdonk.github.io/logodev-mcp/"
-license: "Proprietary"  # starter: TODO update when you pick a license (see LICENSE)
+license: "MIT"
 
 # --- Package contents ---
 

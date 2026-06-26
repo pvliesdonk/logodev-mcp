@@ -3,7 +3,7 @@ name = "logodev-mcp"
 version = "1.0.0"
 description = "Look up company logos and brand data via the logo.dev API."
 readme = "README.md"
-license = "LicenseRef-Proprietary"  # starter: TODO update when you pick a license (see LICENSE)
+license = "MIT"
 requires-python = ">=3.11"
 authors = [{ name = "pvliesdonk" }]
 keywords = []
@@ -13,7 +13,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "License :: Other/Proprietary License",  # starter: TODO update when you pick a license (see LICENSE)
+    "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
     "fastmcp-pvl-core>=4.0.0,<5",

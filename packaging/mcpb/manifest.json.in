@@ -16,7 +16,7 @@
   "homepage": "https://pvliesdonk.github.io/logodev-mcp/",
   "documentation": "https://pvliesdonk.github.io/logodev-mcp/",
   "support": "https://github.com/pvliesdonk/logodev-mcp/issues",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "keywords": [],
   "server": {
     "type": "uv",
