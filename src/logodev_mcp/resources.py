@@ -24,4 +24,11 @@ def register_resources(mcp: FastMCP) -> None:
         https://gofastmcp.com/servers/resources#templates for the full
         pattern.
         """
-        return await service.status()
+        return {
+            # "ready" reflects an operable service: started AND at least one
+            # API key configured, so a keyless (no-tool) deployment reports
+            # not-ready rather than masking the misconfiguration.
+            "ready": service.has_publishable or service.has_secret,
+            "has_publishable": service.has_publishable,
+            "has_secret": service.has_secret,
+        }
