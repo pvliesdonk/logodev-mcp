@@ -186,3 +186,43 @@ class Service:
 
         resp = await self._get(self._img, path, params=params, subject=identifier)
         return url, resp.content
+
+    def _require_secret(self) -> httpx.AsyncClient:
+        """Return the api client, or raise if the secret key is unconfigured."""
+        if not self.has_secret or self._api is None:
+            raise LogoDevError(
+                "This endpoint needs a secret key — set LOGODEV_MCP_SECRET_KEY "
+                "(Search/Describe/Brand require a paid plan)."
+            )
+        return self._api
+
+    async def search_brands(self, query: str, *, strategy: str = "suggest") -> Any:
+        """Resolve a brand/company name to candidate domains."""
+        api = self._require_secret()
+        if strategy not in _STRATEGIES:
+            raise LogoDevError(
+                f"Invalid strategy {strategy!r}; expected one of {list(_STRATEGIES)}."
+            )
+        if not query.strip():
+            raise LogoDevError("query must not be empty.")
+        params: dict[str, Any] = {"q": query}
+        if strategy != "suggest":
+            params["strategy"] = strategy
+        resp = await self._get(api, "/search", params=params, subject=query)
+        return resp.json()
+
+    async def describe_company(self, domain: str) -> Any:
+        """Return structured company data for a domain."""
+        api = self._require_secret()
+        if not domain.strip():
+            raise LogoDevError("domain must not be empty.")
+        resp = await self._get(api, f"/describe/{domain}", subject=domain)
+        return resp.json()
+
+    async def get_brand(self, domain: str) -> Any:
+        """Return the full brand profile for a domain."""
+        api = self._require_secret()
+        if not domain.strip():
+            raise LogoDevError("domain must not be empty.")
+        resp = await self._get(api, f"/brand/{domain}", subject=domain)
+        return resp.json()

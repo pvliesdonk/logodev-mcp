@@ -174,3 +174,137 @@ async def test_get_logo_maps_404() -> None:
         assert exc.value.status == 404
     finally:
         await service.stop()
+
+
+def _api_service() -> Service:
+    return Service(ProjectConfig(secret_key="sk_test"))
+
+
+@pytest.mark.asyncio
+async def test_search_brands_sends_query_and_parses_json() -> None:
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            route = respx.get(f"{API_BASE}/search").mock(
+                return_value=httpx.Response(
+                    200, json=[{"name": "Nike", "domain": "nike.com"}]
+                )
+            )
+            result = await service.search_brands("nike", strategy="match")
+        assert result == [{"name": "Nike", "domain": "nike.com"}]
+        sent = route.calls.last.request
+        assert sent.url.params["q"] == "nike"
+        assert sent.url.params["strategy"] == "match"
+        assert sent.headers["Authorization"] == "Bearer sk_test"
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_search_brands_omits_default_strategy() -> None:
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            route = respx.get(f"{API_BASE}/search").mock(
+                return_value=httpx.Response(200, json=[])
+            )
+            await service.search_brands("nike")
+        assert "strategy" not in route.calls.last.request.url.params
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_search_brands_rejects_bad_strategy_before_http() -> None:
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            route = respx.get(f"{API_BASE}/search").mock(
+                return_value=httpx.Response(200, json=[])
+            )
+            with pytest.raises(LogoDevError):
+                await service.search_brands("nike", strategy="fuzzy")
+            assert route.called is False
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_describe_company_hits_describe_path() -> None:
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(f"{API_BASE}/describe/nike.com").mock(
+                return_value=httpx.Response(200, json={"name": "Nike"})
+            )
+            result = await service.describe_company("nike.com")
+        assert result == {"name": "Nike"}
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_get_brand_hits_brand_path() -> None:
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(f"{API_BASE}/brand/nike.com").mock(
+                return_value=httpx.Response(200, json={"colors": ["#111"]})
+            )
+            result = await service.get_brand("nike.com")
+        assert result == {"colors": ["#111"]}
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_rest_methods_map_401() -> None:
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(f"{API_BASE}/brand/nike.com").mock(
+                return_value=httpx.Response(401)
+            )
+            with pytest.raises(LogoDevError) as exc:
+                await service.get_brand("nike.com")
+        assert exc.value.status == 401
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_rest_methods_require_secret_key() -> None:
+    service = Service(ProjectConfig())  # no keys
+    await service.start()
+    try:
+        for call in (
+            service.search_brands("nike"),
+            service.describe_company("nike.com"),
+            service.get_brand("nike.com"),
+        ):
+            with pytest.raises(LogoDevError):
+                await call
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_search_brands_maps_timeout() -> None:
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(f"{API_BASE}/search").mock(
+                side_effect=httpx.ConnectTimeout("slow")
+            )
+            with pytest.raises(LogoDevError) as exc:
+                await service.search_brands("nike")
+        assert "did not respond" in exc.value.message
+    finally:
+        await service.stop()
