@@ -92,6 +92,20 @@ async def test_get_logo_url_only_makes_no_request() -> None:
 
 
 @pytest.mark.asyncio
+async def test_get_logo_encodes_identifier_in_path() -> None:
+    service = _img_service()
+    await service.start()
+    try:
+        url, _ = await service.get_logo(
+            "Johnson & Johnson", identifier_type="name", url_only=True
+        )
+        # Spaces and '&' must be percent-encoded, not left to split the path.
+        assert f"{IMG_BASE}/name/Johnson%20%26%20Johnson" in url
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
 async def test_get_logo_fetches_bytes_and_builds_url() -> None:
     service = _img_service()
     await service.start()

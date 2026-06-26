@@ -192,7 +192,9 @@ class Service:
                 f"Invalid fallback {fallback!r}; expected one of {list(_FALLBACKS)}."
             )
 
-        path = _IDENTIFIER_PATHS[identifier_type].format(ident=identifier)
+        path = _IDENTIFIER_PATHS[identifier_type].format(
+            ident=quote(identifier, safe="")
+        )
         params: dict[str, Any] = {
             "token": self._config.publishable_key,
             "format": image_format,
