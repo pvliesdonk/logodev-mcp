@@ -102,6 +102,7 @@ ignore = ["E501"]
 "tests/conftest.py" = ["TC002", "TC003"]
 "tests/test_smoke.py" = ["TC002", "TC003"]
 "tests/test_tools.py" = ["TC002"]
+"tests/test_config.py" = ["TC002"]
 # PROJECT-RUFF-IGNORES-END
 
 [tool.ruff.lint.isort]
