@@ -89,7 +89,7 @@ def make_server(
 
     wire_middleware_stack(mcp)
 
-    register_tools(mcp, config=config)
+    register_tools(mcp)
     register_resources(mcp)
     register_prompts(mcp)
     register_apps(mcp)

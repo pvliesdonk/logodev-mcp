@@ -13,5 +13,15 @@ variables (`LOGODEV_MCP_TRANSPORT`, `LOGODEV_MCP_HOST`,
 <!-- DOMAIN-CONFIG-VARS-START -->
 ## Domain variables
 
-Document your project-specific variables here.
+logo.dev needs two API keys. At least one must be set for any API tool to be
+registered; tools whose key is absent are hidden.
+
+| Variable | Required | Description |
+|---|---|---|
+| `LOGODEV_MCP_PUBLISHABLE_KEY` | Conditional | Publishable key (`pk_...`). Enables the `get_logo` tool. |
+| `LOGODEV_MCP_SECRET_KEY` | Conditional | Secret key (`sk_...`). Enables `search_brands`, `describe_company`, and `get_brand`. |
+
+Get keys from the [logo.dev dashboard](https://www.logo.dev). The publishable
+key is sent as a query token to the image CDN; the secret key is sent as a
+bearer token to the REST API.
 <!-- DOMAIN-CONFIG-VARS-END -->
