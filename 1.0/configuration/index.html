@@ -1046,7 +1046,32 @@ variables (<code>LOGODEV_MCP_TRANSPORT</code>, <code>LOGODEV_MCP_HOST</code>,
 <code>LOGODEV_MCP_BASE_URL</code>, auth vars, etc.).</p>
 <!-- DOMAIN-CONFIG-VARS-START -->
 <h2 id="domain-variables">Domain variables<a class="headerlink" href="#domain-variables" title="Permanent link">&para;</a></h2>
-<p>Document your project-specific variables here.</p>
+<p>logo.dev needs two API keys. At least one must be set for any API tool to be
+registered; tools whose key is absent are hidden.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LOGODEV_MCP_PUBLISHABLE_KEY</code></td>
+<td>Conditional</td>
+<td>Publishable key (<code>pk_...</code>). Enables the <code>get_logo</code> tool.</td>
+</tr>
+<tr>
+<td><code>LOGODEV_MCP_SECRET_KEY</code></td>
+<td>Conditional</td>
+<td>Secret key (<code>sk_...</code>). Enables <code>search_brands</code>, <code>describe_company</code>, and <code>get_brand</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Get keys from the <a href="https://www.logo.dev">logo.dev dashboard</a>. The publishable
+key is sent as a query token to the image CDN; the secret key is sent as a
+bearer token to the REST API.</p>
 <!-- DOMAIN-CONFIG-VARS-END -->
 
 

@@ -1064,14 +1064,26 @@
 <!-- DOMAIN-INDEX-FEATURES-START -->
 <h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
 <ul>
-<li><em>Add features specific to your server here.</em></li>
+<li><strong>Logo retrieval</strong> (<code>get_logo</code>): fetch a company logo by domain, ticker,
+  ISIN, crypto symbol, or brand name. Requires the publishable key.</li>
+<li><strong>Brand search</strong> (<code>search_brands</code>): resolve a name to candidate domains.
+  Requires the secret key.</li>
+<li><strong>Company data</strong> (<code>describe_company</code>): structured company info for a domain.
+  Requires the secret key.</li>
+<li><strong>Brand profile</strong> (<code>get_brand</code>): the full brand kit for a domain. Requires
+  the secret key.</li>
+<li><strong>Graceful degradation</strong>: each tool is registered only when its API key is
+  configured, so missing-key tools are hidden.</li>
 </ul>
 <!-- DOMAIN-INDEX-FEATURES-END -->
 
 <!-- DOMAIN-INDEX-USE-CASES-START -->
 <h2 id="what-you-can-do">What you can do<a class="headerlink" href="#what-you-can-do" title="Permanent link">&para;</a></h2>
 <ul>
-<li><em>Add usage examples here.</em></li>
+<li>"Get the logo for a given company domain." (<code>get_logo</code>)</li>
+<li>"What domain is behind this brand name?" (<code>search_brands</code>)</li>
+<li>"What brand colors does this company use?" (<code>describe_company</code>)</li>
+<li>"Show me the full brand profile for this domain." (<code>get_brand</code>)</li>
 </ul>
 <!-- DOMAIN-INDEX-USE-CASES-END -->
 
