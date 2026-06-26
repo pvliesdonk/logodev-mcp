@@ -1,0 +1,64 @@
+{
+  "manifest_version": "0.4",
+  "name": "logodev-mcp",
+  "display_name": "Logo.dev MCP",
+  "version": "${VERSION}",
+  "description": "Look up company logos and brand data via the logo.dev API.",
+  "long_description": "Look up company logos and brand data via the logo.dev API.",
+  "author": {
+    "name": "pvliesdonk",
+    "url": "https://github.com/pvliesdonk"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pvliesdonk/logodev-mcp.git"
+  },
+  "homepage": "https://pvliesdonk.github.io/logodev-mcp/",
+  "documentation": "https://pvliesdonk.github.io/logodev-mcp/",
+  "support": "https://github.com/pvliesdonk/logodev-mcp/issues",
+  "license": "UNLICENSED",
+  "keywords": [],
+  "server": {
+    "type": "uv",
+    "entry_point": "src/server.py",
+    "mcp_config": {
+      "command": "uvx",
+      "args": ["--from", "logodev-mcp[all]==${VERSION}", "logodev-mcp", "serve"],
+      "env": {
+        "LOGODEV_MCP_SERVER_NAME": "${user_config.server_name}",
+        "LOGODEV_MCP_READ_ONLY":   "${user_config.read_only}",
+        "FASTMCP_LOG_LEVEL":            "${user_config.log_level}"
+      }
+    }
+  },
+  "user_config": {
+    "server_name": {
+      "type": "string",
+      "title": "Server name",
+      "description": "Name shown in the Claude tool list.",
+      "required": false,
+      "default": "logodev-mcp"
+    },
+    "read_only": {
+      "type": "boolean",
+      "title": "Read-only mode",
+      "description": "When true, write-tagged tools are hidden.",
+      "required": false,
+      "default": true
+    },
+    "log_level": {
+      "type": "string",
+      "title": "Log level",
+      "description": "One of: DEBUG, INFO, WARNING, ERROR.",
+      "required": false,
+      "default": "INFO"
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "python": ">=3.11,<4.0"
+    }
+  }
+}

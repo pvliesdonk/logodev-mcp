@@ -1,0 +1,177 @@
+# Logo.dev MCP
+
+Look up company logos and brand data via the logo.dev API.
+
+## Design
+<!-- DOMAIN-START -->
+<!-- Describe your service's design here. Kept across copier update. -->
+<!-- DOMAIN-END -->
+
+## Project Structure
+<!-- DOMAIN-START -->
+<!-- Document your project layout here. Kept across copier update. -->
+<!-- DOMAIN-END -->
+
+<!-- ===== TEMPLATE-OWNED SECTIONS BELOW — DO NOT EDIT; CHANGES WILL BE OVERWRITTEN ON COPIER UPDATE ===== -->
+
+## Conventions
+
+- Python 3.11+
+- `uv` for package management, `ruff` for linting/formatting (line length 88)
+- `hatchling` build backend
+- Conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
+- Google-style docstrings on all public functions
+- `logging.getLogger(__name__)` throughout, no `print()`
+- Type hints everywhere
+- Tests: `pytest` with fixtures in `tests/fixtures/`
+
+## Hard PR Acceptance Gates
+
+Every PR must pass **all** of the following before merge. Do not open or push a PR until these are green locally:
+
+1. **CI passes** — `uv run pytest -x -q` all tests pass
+2. **Lint passes** — run in this exact order: `uv run ruff check --fix .` then `uv run ruff format .` then verify with `uv run ruff format --check .`. Always run format *after* check --fix because check --fix can leave files needing reformatting.
+3. **Type-check passes** — `uv run mypy src/ tests/` reports no errors
+4. **Patch coverage ≥ 80%** — Codecov measures only lines added/changed in the PR diff. Run `uv run pytest --cov=<changed_module> --cov-report=term-missing` and verify new code is exercised. Add tests for every uncovered branch before pushing.
+5. **Docs updated** — `README.md` and `docs/**` reflect any user-facing changes in the same commit
+6. **Manifest version lockstep** — `server.json`, `.claude-plugin/plugin/.claude-plugin/plugin.json`, and `.claude-plugin/plugin/.mcp.json` must all carry the same version. The release workflow bumps them atomically via PSR; manual touches require updating all three.
+
+## Pre-commit Hooks
+
+This project ships a `.pre-commit-config.yaml` that runs ruff (check + format), mypy on `src/` and `tests/`, gitleaks secret scanning, and standard whitespace/YAML/JSON checks — aligned with the `ci.yml` lint/typecheck/secrets jobs so a clean pre-commit run implies a clean CI lane.
+
+- **Install once per clone:** `uv run pre-commit install`.
+- **Run on demand before pushing:** `uv run pre-commit run --all-files`. A green run is a precondition for gates #2 and #3 above.
+- **Never bypass with `--no-verify`.** A failing hook means the same check will fail in CI; fix the underlying issue rather than silencing it.
+
+The config is in `_skip_if_exists`, so domain-specific additions (shellcheck, yamllint, project-specific linters, additional file checks) on top of the shipped defaults survive `copier update`.
+
+## PR Discipline
+
+**Every PR must have at least one associated issue.** If the work doesn't have one yet — a bug found in the wild, an opportunistic cleanup, a small improvement — create the issue first, then open the PR with `Closes #N` (or `Refs #N`) in the body. A single PR may close multiple issues (`Closes #A, closes #B`) — bundling related fixes is fine; the rule is "no orphan PRs", not "one PR per issue". This keeps the changelog, release notes, and cross-repo history coherent.
+
+Trivial exceptions: pure typo fixes and automated dependency bumps (Dependabot / Renovate) may skip the issue.
+
+<!-- TEMPLATE-TRACKING-START -->
+**Bot reviewers (claude-review, gemini-code-assist) are merge gates, not pair reviewers.** Local review must be complete before the PR opens. If a bot finds anything on first run, the local review was incomplete — that is a discipline failure to investigate, not "address-and-move-on." Run a local code-review pass on the cumulative diff before `gh pr create`; the bots are not a substitute.
+<!-- TEMPLATE-TRACKING-END -->
+
+## GitHub Review Types
+
+GitHub has two distinct review mechanisms — **both must be read and addressed**:
+
+- **Inline review comments** (`get_review_comments`): attached to specific lines of the diff. Appear in the "Files changed" tab. Use `get_review_comments` to fetch these.
+- **PR-level comments** (`get_comments`): posted on the Conversation tab, not tied to a line. Review summary posts, bot analysis, and blocking issues are often posted here. Use `get_comments` to fetch these.
+
+Always fetch both before declaring a review round complete.
+
+## Documentation Discipline
+
+Every issue, PR, and code change must consider documentation impact. Before closing any issue or creating any PR, check whether the following need updating:
+
+- **`docs/design.md`** — the authoritative spec. Any new feature, changed behavior, or architectural decision must be reflected here.
+- **`README.md`** — user-facing documentation. New env vars, tools, resources, prompts, CLI flags, or configuration options must be documented here.
+- **`docs/` site pages** — the published documentation site. New or changed MCP tools/resources/prompts, new env vars, new installation methods or deployment options.
+- **`CHANGELOG.md`** — managed by semantic-release from conventional commits.
+- **Inline docstrings** — new or changed public API methods need accurate Google-style docstrings.
+
+**Rule: code without matching docs is incomplete.**
+
+## Logging Standard
+
+### Scope
+
+This standard governs **first-party code only** — `src/logodev_mcp/` and
+`tests/`. Two categories of log output are explicitly **out of scope**; do not
+try to make them conform:
+
+- **FastMCP middleware stack** (`fastmcp-pvl-core` timing / logging /
+  error-handling middleware): emits conforming, bare-event-name-first lines
+  automatically. Tool-call lines carry `tool=<name>`. Governed by
+  `fastmcp-pvl-core` itself (see pvliesdonk/fastmcp-pvl-core#90); no
+  first-party code needed.
+- **`uvicorn.access` and `mcp.server.lowlevel.server` log lines**: upstream
+  transport / SDK output. `configure_logging_from_env` raises their effective
+  level to `WARNING`, suppressing per-request `INFO` output at the default
+  level; at `DEBUG` they are reset to `NOTSET` so the root logger governs
+  their effective level via propagation (pvliesdonk/fastmcp-pvl-core#91).
+  `uvicorn.error` is intentionally not suppressed — it carries startup and
+  bind failures. Do not silence or reformat any of these — they are out of
+  scope by design.
+
+### Framework
+- Standard library `logging` throughout. Every module: `logger = logging.getLogger(__name__)`.
+- No `print()` for operational output. No third-party logging libraries.
+- FastMCP middleware handles tool invocation, timing, and error logging automatically.
+- All first-party logging goes through FastMCP's `configure_logging_from_env()` for uniform output. `FASTMCP_LOG_LEVEL` is the single log level control; the `-v` CLI flag sets it to `DEBUG`. `FASTMCP_ENABLE_RICH_LOGGING=false` switches to plain/JSON output.
+
+### Log Levels
+| Level | Use for |
+|-------|---------|
+| `DEBUG` | Detailed internals: cache hits, parameter values, config resolution |
+| `INFO` | Significant operations: service startup, configuration decisions (tool calls logged by middleware) |
+| `WARNING` | Degraded but continuing: API errors with fallback, missing optional config, unexpected data |
+| `ERROR` | Failures affecting the primary result. Use `logger.error(..., exc_info=True)` when traceback is needed |
+
+### Exception Handling
+- All exceptions must be caught and handled. No bare `except:`. Always specify the exception type.
+- Expected errors (HTTP 4xx, missing data): catch, log, return user-facing error string.
+- Optional enrichment failures: catch, log at `DEBUG` with `exc_info=True`, continue.
+- Primary result errors: catch, log at `WARNING` or `ERROR`, return error string.
+- `ErrorHandlingMiddleware` is a safety net. If it catches something, that's a bug to fix.
+
+### Message Format
+- Pseudo-structured: `logger.info("event_name key=%s", value)`
+- Event name as first token (snake_case), then key=value pairs via `%s` formatting.
+- Never use f-strings in log calls (defeats lazy evaluation).
+
+## Config & Customization Contract
+
+Domain configuration composes `fastmcp_pvl_core.ServerConfig` inside your domain config class (see `src/logodev_mcp/config.py`).  Add domain fields between the `CONFIG-FIELDS-START` / `CONFIG-FIELDS-END` sentinels and populate them in `from_env` between the `CONFIG-FROM-ENV-START` / `CONFIG-FROM-ENV-END` sentinels.  Never inherit from `ServerConfig`; always compose.
+
+Env var prefix is `LOGODEV_MCP_` — all env reads go through `fastmcp_pvl_core.env(_ENV_PREFIX, "SUFFIX", default)` so naming stays consistent.
+
+### Tool icons
+
+Drop SVG / PNG / ICO / JPEG files into `src/logodev_mcp/static/icons/` and bulk-attach them to registered tools via `fastmcp_pvl_core.register_tool_icons(mcp, {"tool_name": "filename.svg"}, static_dir=...)` at the end of `register_tools()` — or attach at decoration time with `@mcp.tool(icons=[make_icon(STATIC / "x.svg")])` (where `STATIC = Path(__file__).parent / "static" / "icons"` is a shorthand you define at module level). The scaffold ships an empty `static/icons/` directory; commented-out wiring lives in `tools.py`.
+
+### Dockerfile extension points
+
+These sentinel blocks in `Dockerfile` are preserved across `copier update`. Add domain-specific apt packages, uv extras, state subdirs, and volume mounts inside them:
+
+- `# DOCKERFILE-APT-DEPS-START` / `-END` — extra apt packages installed into the runtime image
+- `# DOCKERFILE-UV-EXTRAS-START` / `-END` — `--extra <name>` flags added to both `uv sync` invocations (deps cache layer + project install — adding only to one breaks the cache layer)
+- `# DOCKERFILE-STATE-DIRS-START` / `-END` — state subdirectories created under `/data` (chowned to the runtime user)
+- `# DOCKERFILE-VOLUMES-START` / `-END` — `VOLUME` declarations on the final image
+
+## Server Info Tool (`get_server_info`)
+
+`make_server()` registers `get_server_info` (via `fastmcp_pvl_core.register_server_info_tool`) so operators can answer "is the latest fix actually deployed?" with a single MCP call. The default response carries `server_name`, `server_version`, and `core_version`.
+
+For services that talk to a remote upstream (e.g. paperless, an HTTP API), wire the upstream version inside the `DOMAIN-UPSTREAM-START` / `DOMAIN-UPSTREAM-END` sentinel in `src/logodev_mcp/server.py`. Pass `upstream_version=` (a zero-arg callable returning a dict / str / None) and optionally `upstream_label="<service>"` (default `"upstream"`). The simplest pattern is a module-level upstream client (typically constructed from env vars at import time) whose version method is referenced from the callable — `CurrentContext()` is a FastMCP DI marker that only resolves inside parameter defaults, so it cannot be called directly from a zero-arg provider. The block is preserved across `copier update`.
+
+<!-- TEMPLATE-TRACKING-START -->
+## Shared Infrastructure
+
+Shared infrastructure (auth providers, middleware stack, logging bootstrap, event store factory, CLI scaffolding, release pipeline, Docker entrypoint, nfpm packaging, mcpb bundle) lives upstream in two places:
+
+- [`fastmcp-pvl-core`](https://github.com/pvliesdonk/fastmcp-pvl-core) — the Python library that provides `ServerConfig`, auth builders, middleware helpers, and the `make_serve_parser` / `configure_logging_from_env` / `normalise_http_path` CLI helpers.
+- [`fastmcp-server-template`](https://github.com/pvliesdonk/fastmcp-server-template) — the copier template this project was generated from. Ships the CI/release workflows, `Dockerfile`, `packaging/nfpm.yaml`, `packaging/mcpb/*`, `scripts/bump_manifests.py`, server.py skeleton, `.gemini/config.yaml` (gemini-code-assist scope control), and this very section of CLAUDE.md.
+
+Fixes and improvements to shared code land in those repos and propagate here via `copier update` against the template's latest tag — run manually or via the weekly `.github/workflows/copier-update.yml` cron. Starter files listed in `_skip_if_exists` (e.g. `scripts/bump_manifests.py`, `packaging/mcpb/*`, the `tools.py` / `resources.py` / `prompts.py` / `domain.py` scaffolds, `README.md`, `CHANGELOG.md`, `LICENSE`, `.env.example`) are written once and require manual reconciliation on template updates — review `_skip_if_exists` in the template's `copier.yml` if you need to force-sync a file. Domain-specific code (tools, resources, prompts, and the fields and logic inside the `CONFIG-FIELDS-START` / `CONFIG-FIELDS-END` and `CONFIG-FROM-ENV-START` / `CONFIG-FROM-ENV-END` sentinels) stays in this repo.
+
+## Contributing fixes upstream
+
+- **Library-level fix** (anything you'd change in `fastmcp_pvl_core`): open a PR on `pvliesdonk/fastmcp-pvl-core`. After merge + release, bump `fastmcp-pvl-core` in this project's `pyproject.toml`. (Copier update alone won't pick it up unless the template's version constraint in `pyproject.toml.jinja` is also bumped.)
+- **Template-level fix** (anything template-owned — `Dockerfile`, workflows, `server.py` skeleton, `CLAUDE.md` sections): open a PR on `pvliesdonk/fastmcp-server-template`. After merge + release, this project gets the fix on the next weekly `copier update` cron (or dispatch the workflow manually).
+- **Domain-only fix** (anything inside a `DOMAIN-*`, `CONFIG-*`, or `PROJECT-*` sentinel block, `tools.py`, `resources.py`, `prompts.py`, `domain.py`, `tests/`): PR on this repo directly.
+
+If a conflict marker appears in a copier-update bot PR, the conflict itself often signals a template bug — investigate whether the template's version needs fixing before resolving locally.
+<!-- TEMPLATE-TRACKING-END -->
+
+<!-- ===== TEMPLATE-OWNED SECTIONS END ===== -->
+
+## Key Design Decisions
+<!-- DOMAIN-START -->
+<!-- Document your service's design decisions here. Kept across copier update. -->
+<!-- DOMAIN-END -->

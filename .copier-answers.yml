@@ -1,0 +1,13 @@
+# Changes here will be overwritten by `copier update`.
+_commit: v2.5.3
+_src_path: gh:pvliesdonk/fastmcp-server-template
+docker_registry: ghcr.io/pvliesdonk
+domain_description: Look up company logos and brand data via the logo.dev API.
+enable_authorization: false
+env_prefix: LOGODEV_MCP
+github_org: pvliesdonk
+human_name: Logo.dev MCP
+include_mcp_apps_scaffold: false
+project_name: logodev-mcp
+pypi_name: logodev-mcp
+python_module: logodev_mcp

@@ -1,0 +1,115 @@
+"""Smoke tests for Logo.dev MCP."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+import pytest
+from fastmcp import Client
+
+from logodev_mcp._server_apps import register_apps
+from logodev_mcp.server import make_server
+
+
+def test_make_server_constructs() -> None:
+    """make_server() returns a FastMCP instance without raising."""
+    server = make_server()
+    assert server is not None
+
+
+def test_register_apps_logs_when_app_domain_set(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """register_apps logs the configured app domain when the env var is set.
+
+    Covers the ``if app_domain:`` branch of ``_server_apps.register_apps``,
+    which the default smoke tests miss because no ``LOGODEV_MCP_APP_DOMAIN``
+    is set in the test env.  Pass a real ``FastMCP`` instance so the test
+    keeps working if a downstream maintainer adds real registrations to the
+    branch (the scaffold's no-op branch ignores the argument today).
+    """
+    monkeypatch.setenv("LOGODEV_MCP_APP_DOMAIN", "example.com")
+    with caplog.at_level("INFO", logger="logodev_mcp._server_apps"):
+        register_apps(make_server())
+    assert any("example.com" in r.message for r in caplog.records)
+
+
+async def test_status_resource_reports_ready(client: Client[Any]) -> None:
+    """The example ``status://`` resource reports a started service.
+
+    The lifespan calls ``service.start()``, so the resource payload must
+    contain ``ready: true`` — asserting the value (not just the key name)
+    catches a future regression where the lifespan stops starting the
+    service.
+    """
+    result = await client.read_resource("status://logodev-mcp")
+    first = result[0]
+    assert hasattr(first, "text"), (
+        f"expected text resource content, got {type(first).__name__}"
+    )
+    assert json.loads(first.text) == {"ready": True}
+
+
+async def test_get_server_info_tool_registered(client: Client[Any]) -> None:
+    """``get_server_info`` is wired by default and returns the wrapper info.
+
+    The default scaffold registers the helper without an upstream provider,
+    so the response carries ``server_name``, ``server_version``, and
+    ``core_version`` — no ``upstream`` block. Projects that wire an
+    upstream provider inside the ``DOMAIN-UPSTREAM`` sentinel in
+    ``server.py`` extend this contract.
+    """
+    tools = {t.name for t in await client.list_tools()}
+    assert "get_server_info" in tools
+
+    result = await client.call_tool("get_server_info", {})
+    first = result.content[0]
+    assert hasattr(first, "text"), (
+        f"expected text tool content, got {type(first).__name__}"
+    )
+    payload = json.loads(first.text)
+    assert payload["server_name"] == "logodev-mcp"
+    assert "server_version" in payload
+    assert "core_version" in payload
+    # No upstream block in the default scaffold — locks in the contract that
+    # projects opt into by wiring the DOMAIN-UPSTREAM sentinel in server.py.
+    assert "upstream" not in payload
+
+
+async def test_summarize_prompt_includes_context(client: Client[Any]) -> None:
+    """The example ``summarize`` prompt round-trips its ``context`` argument."""
+    result = await client.get_prompt("summarize", {"context": "hello world"})
+    content = result.messages[0].content
+    assert hasattr(content, "text"), (
+        f"expected text prompt content, got {type(content).__name__}"
+    )
+    assert "hello world" in content.text
+
+
+async def test_no_file_exchange_scaffolding(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """make_server() registers no file-exchange tools.
+
+    The scaffold no longer calls ``register_file_exchange`` (removed
+    because the upstream pvl-core 3.x line dropped the API). Under the
+    HTTP + ``MCP_EXCHANGE_DIR`` configuration that previously activated
+    the producer tool, ``create_download_link`` is absent — so re-adding
+    ``register_file_exchange`` to ``make_server()`` would re-register it
+    and fail the first assertion below. The ``fetch_file`` /
+    ``create_upload_link`` assertions are defence-in-depth.
+    """
+    monkeypatch.setenv("LOGODEV_MCP_TRANSPORT", "http")
+    monkeypatch.setenv("LOGODEV_MCP_BASE_URL", "https://test.example.com")
+    monkeypatch.setenv("MCP_EXCHANGE_DIR", str(tmp_path))
+
+    server = make_server(transport="http")
+    async with Client(server) as smoke_client:
+        tools = {t.name for t in await smoke_client.list_tools()}
+    assert "create_download_link" not in tools
+    assert "fetch_file" not in tools
+    assert "create_upload_link" not in tools
