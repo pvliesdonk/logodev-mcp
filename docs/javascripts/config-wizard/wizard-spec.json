@@ -6,6 +6,8 @@
     "envPrefix": "LOGODEV_MCP"
   },
   "secretKeys": [
+    "LOGODEV_MCP_PUBLISHABLE_KEY",
+    "LOGODEV_MCP_SECRET_KEY",
     "LOGODEV_MCP_BEARER_TOKEN"
   ],
   "questions": [
@@ -18,6 +20,20 @@
         { "value": "local", "label": "Local (Claude Desktop / Claude Code, stdio)" },
         { "value": "server", "label": "Server (HTTP — Docker / Compose / systemd)" }
       ]
+    },
+    {
+      "id": "publishable_key",
+      "label": "logo.dev publishable key",
+      "help": "pk_... key from the logo.dev dashboard. Enables the get_logo tool. Leave blank to hide it.",
+      "type": "text",
+      "var": "LOGODEV_MCP_PUBLISHABLE_KEY"
+    },
+    {
+      "id": "secret_key",
+      "label": "logo.dev secret key",
+      "help": "sk_... key from the logo.dev dashboard. Enables search_brands, describe_company, and get_brand. Leave blank to hide them.",
+      "type": "text",
+      "var": "LOGODEV_MCP_SECRET_KEY"
     },
     {
       "id": "bearer_token",
