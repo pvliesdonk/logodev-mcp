@@ -125,3 +125,64 @@ class Service:
             raise LogoDevError("Cannot reach logo.dev.") from exc
         self._raise_for_status(resp, subject=subject)
         return resp
+
+    async def get_logo(
+        self,
+        identifier: str,
+        *,
+        identifier_type: str = "domain",
+        size: int = 128,
+        image_format: str = "png",
+        theme: str = "auto",
+        greyscale: bool = False,
+        retina: bool = False,
+        fallback: str = "monogram",
+        url_only: bool = False,
+    ) -> tuple[str, bytes | None]:
+        """Build the img.logo.dev URL and (unless ``url_only``) fetch the bytes."""
+        if not self.has_publishable or self._config is None or self._img is None:
+            raise LogoDevError(
+                "Logo API not configured — set LOGODEV_MCP_PUBLISHABLE_KEY."
+            )
+        if identifier_type not in _IDENTIFIER_PATHS:
+            raise LogoDevError(
+                f"Invalid identifier_type {identifier_type!r}; expected one of "
+                f"{list(_IDENTIFIER_PATHS)}."
+            )
+        if not 1 <= size <= 800:
+            raise LogoDevError("size must be between 1 and 800.")
+        if image_format not in _FORMATS:
+            raise LogoDevError(
+                f"Invalid format {image_format!r}; expected one of {list(_FORMATS)}."
+            )
+        if theme not in _THEMES:
+            raise LogoDevError(
+                f"Invalid theme {theme!r}; expected one of {list(_THEMES)}."
+            )
+        if fallback not in _FALLBACKS:
+            raise LogoDevError(
+                f"Invalid fallback {fallback!r}; expected one of {list(_FALLBACKS)}."
+            )
+
+        path = _IDENTIFIER_PATHS[identifier_type].format(ident=identifier)
+        params: dict[str, Any] = {
+            "token": self._config.publishable_key,
+            "format": image_format,
+        }
+        if size != 128:
+            params["size"] = size
+        if theme != "auto":
+            params["theme"] = theme
+        if greyscale:
+            params["greyscale"] = "true"
+        if retina:
+            params["retina"] = "true"
+        if fallback != "monogram":
+            params["fallback"] = fallback
+
+        url = str(httpx.URL(IMG_BASE + path, params=params))
+        if url_only:
+            return url, None
+
+        resp = await self._get(self._img, path, params=params, subject=identifier)
+        return url, resp.content
