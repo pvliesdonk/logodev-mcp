@@ -29,8 +29,9 @@ _IDENTIFIER_PATHS = {
 }
 _FORMATS = ("jpg", "png", "webp")
 _THEMES = ("auto", "light", "dark")
-# "404" is the logo.dev API's documented literal: return HTTP 404 instead of a
-# placeholder monogram when no logo exists for the identifier.
+# "404" is passed through to logo.dev as the ``fallback`` query value (the
+# alternative to "monogram"): it asks for an HTTP 404 rather than a placeholder
+# image when no logo exists for the identifier.
 _FALLBACKS = ("monogram", "404")
 _STRATEGIES = ("suggest", "match")
 
@@ -83,10 +84,11 @@ class Service:
         if self.has_publishable:
             self._img = httpx.AsyncClient(base_url=IMG_BASE, timeout=_TIMEOUT)
 
-        # Report each API by its client object, not by the secret-named flags,
-        # so the secret-key value never reaches a logging sink (CodeQL
-        # py/clear-text-logging-sensitive-data tracks config.secret_key →
-        # has_secret).
+        # Report each API by its client object, not by the secret-named flags.
+        # has_secret is only a bool (no key value), but CodeQL's
+        # py/clear-text-logging-sensitive-data heuristic still flags the
+        # config.secret_key -> has_secret -> log-sink path; logging client
+        # presence avoids that false positive.
         logger.info(
             "service_started image_api=%s rest_api=%s",
             self._img is not None,
@@ -222,6 +224,16 @@ class Service:
             )
         return self._api
 
+    def _json(self, resp: httpx.Response, *, subject: str) -> Any:
+        """Parse a JSON body, mapping a malformed payload to a LogoDevError."""
+        try:
+            return resp.json()
+        except ValueError as exc:  # json.JSONDecodeError is a ValueError subclass
+            logger.warning("logodev_bad_json subject=%s", subject)
+            raise LogoDevError(
+                "logo.dev returned a response that could not be parsed."
+            ) from exc
+
     async def search_brands(self, query: str, *, strategy: str = "suggest") -> Any:
         """Resolve a brand/company name to candidate domains."""
         api = self._require_secret()
@@ -235,7 +247,7 @@ class Service:
         if strategy != "suggest":
             params["strategy"] = strategy
         resp = await self._get(api, "/search", params=params, subject=query)
-        return resp.json()
+        return self._json(resp, subject=query)
 
     async def describe_company(self, domain: str) -> Any:
         """Return structured company data for a domain."""
@@ -245,7 +257,7 @@ class Service:
         resp = await self._get(
             api, f"/describe/{quote(domain, safe='')}", subject=domain
         )
-        return resp.json()
+        return self._json(resp, subject=domain)
 
     async def get_brand(self, domain: str) -> Any:
         """Return the full brand profile for a domain."""
@@ -253,4 +265,4 @@ class Service:
         if not domain.strip():
             raise LogoDevError("domain must not be empty.")
         resp = await self._get(api, f"/brand/{quote(domain, safe='')}", subject=domain)
-        return resp.json()
+        return self._json(resp, subject=domain)

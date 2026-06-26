@@ -41,21 +41,32 @@ def test_register_apps_logs_when_app_domain_set(
     )
 
 
-async def test_status_resource_reports_ready(client: Client[Any]) -> None:
-    """The example ``status://`` resource reports a started service.
+async def test_status_resource_reports_ready(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The ``status://`` resource reports an operable service.
 
-    The lifespan calls ``service.start()``, so the resource payload must
-    contain ``ready: true`` — asserting the value (not just the key name)
-    catches a future regression where the lifespan stops starting the
-    service.
+    "Operable" means the lifespan started the service *and* at least one API
+    key is configured — so a deployment with a key set reports ``ready: true``.
+    A keyless deployment is covered by
+    :func:`test_status_resource_not_ready_without_keys`.
     """
-    result = await client.read_resource("status://logodev-mcp")
+    monkeypatch.setenv("LOGODEV_MCP_PUBLISHABLE_KEY", "pk_test")
+    async with Client(make_server()) as client:
+        result = await client.read_resource("status://logodev-mcp")
     first = result[0]
     assert hasattr(first, "text"), (
         f"expected text resource content, got {type(first).__name__}"
     )
     payload = json.loads(first.text)
     assert payload["ready"] is True
+
+
+async def test_status_resource_not_ready_without_keys(client: Client[Any]) -> None:
+    """With no API keys configured, the status resource reports not-ready."""
+    result = await client.read_resource("status://logodev-mcp")
+    payload = json.loads(result[0].text)  # type: ignore[union-attr]
+    assert payload["ready"] is False
 
 
 async def test_get_server_info_tool_registered(client: Client[Any]) -> None:
