@@ -46,6 +46,14 @@ async def test_no_api_tools_without_keys(monkeypatch: MonkeyPatch) -> None:
 
 
 @pytest.mark.asyncio
+async def test_both_keys_register_all_tools(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("LOGODEV_MCP_PUBLISHABLE_KEY", "pk_x")
+    monkeypatch.setenv("LOGODEV_MCP_SECRET_KEY", "sk_y")
+    names = await _tool_names(make_server())
+    assert {"get_logo", "search_brands", "describe_company", "get_brand"} <= names
+
+
+@pytest.mark.asyncio
 async def test_get_logo_tool_returns_url_and_image(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("LOGODEV_MCP_PUBLISHABLE_KEY", "pk_x")
     monkeypatch.delenv("LOGODEV_MCP_SECRET_KEY", raising=False)

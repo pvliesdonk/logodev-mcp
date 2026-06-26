@@ -4,12 +4,31 @@ Look up company logos and brand data via the logo.dev API.
 
 ## Design
 <!-- DOMAIN-START -->
-<!-- Describe your service's design here. Kept across copier update. -->
+Logo.dev MCP wraps the [logo.dev](https://logo.dev) REST + CDN API as four MCP tools gated by two API key types:
+
+- **`get_logo`** — fetches a company logo image from the logo.dev CDN. Requires `LOGODEV_MCP_PUBLISHABLE_KEY` (`pk_…`).
+- **`search_brands`** — resolves a brand/company name to candidate domains. Requires `LOGODEV_MCP_SECRET_KEY` (`sk_…`).
+- **`describe_company`** — returns structured company data (name, description, colours, socials) for a domain. Requires `LOGODEV_MCP_SECRET_KEY`.
+- **`get_brand`** — returns the full brand profile (logo, brandmark, banners, colours, description) for a domain. Requires `LOGODEV_MCP_SECRET_KEY`.
+
+Tools for a missing key are not registered at all (graceful degradation) — the MCP client only sees tools that can actually execute. If neither key is set, no API tools are registered and a warning is logged.
+
+Errors from the logo.dev API are caught as `LogoDevError` and returned to the caller as a plain text message string rather than raising a server exception.
 <!-- DOMAIN-END -->
 
 ## Project Structure
 <!-- DOMAIN-START -->
-<!-- Document your project layout here. Kept across copier update. -->
+```
+src/logodev_mcp/
+  domain.py      # Service class + LogoDevError — pure Python, no FastMCP imports
+  tools.py       # FastMCP tool registrations; calls into domain.py
+  config.py      # ProjectConfig with publishable_key + secret_key fields
+  _server_deps.py# FastMCP DI provider: get_service() → Service instance
+  server.py      # make_server() — wires config, tools, and server info
+tests/
+  test_tools.py  # Tool registration gating + tool call integration tests (respx)
+  test_domain.py # Domain-layer unit tests (respx, no FastMCP)
+```
 <!-- DOMAIN-END -->
 
 <!-- ===== TEMPLATE-OWNED SECTIONS BELOW — DO NOT EDIT; CHANGES WILL BE OVERWRITTEN ON COPIER UPDATE ===== -->
@@ -173,5 +192,9 @@ If a conflict marker appears in a copier-update bot PR, the conflict itself ofte
 
 ## Key Design Decisions
 <!-- DOMAIN-START -->
-<!-- Document your service's design decisions here. Kept across copier update. -->
+- **`domain.py` is FastMCP-free.** `Service` and `LogoDevError` live in `domain.py` with zero FastMCP imports. `tools.py` is the sole FastMCP boundary. This keeps domain logic independently testable and avoids coupling to the MCP transport.
+- **Two-key gating at registration time.** `register_tools()` in `tools.py` checks `config.publishable_key` and `config.secret_key` and conditionally defines tool functions inside those `if` blocks. Tools for a missing key are never decorated with `@mcp.tool`, so they are invisible to MCP clients.
+- **Errors return strings, not exceptions.** Each tool wrapper catches `LogoDevError` and returns `exc.message` as a plain string. This gives the MCP client a readable error message without a server-side exception trace.
+- **`get_logo` returns `[url, Image]` or just `url`.** When `url_only=False` (default) and image bytes are available, the tool returns a two-element list: a text URL and an `Image` content block. When `url_only=True` the domain layer skips the HTTP fetch and returns `(url, None)`; the tool then returns just the URL string.
+- **`_IMAGE_FORMATS` maps format names for FastMCP `Image`.** logo.dev uses `jpg` but FastMCP's `Image` requires `jpeg`; the mapping dict in `tools.py` translates at the boundary.
 <!-- DOMAIN-END -->
