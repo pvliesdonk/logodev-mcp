@@ -34,11 +34,11 @@ def test_register_apps_logs_when_app_domain_set(
     monkeypatch.setenv("LOGODEV_MCP_APP_DOMAIN", "example.com")
     with caplog.at_level("INFO", logger="logodev_mcp._server_apps"):
         register_apps(make_server())
-    # Assert on the structured log arg, not a substring of the formatted
-    # message, so the check is exact (and not a URL host-substring pattern).
-    assert any(
-        isinstance(r.args, tuple) and "example.com" in r.args for r in caplog.records
-    )
+    # Assert exact equality on the structured log args (not a substring match
+    # of the formatted message) so the check is precise and avoids the CodeQL
+    # incomplete-url-substring-sanitization heuristic, which keys on a
+    # hostname-like literal inside an ``in`` / startswith expression.
+    assert any(r.args == ("example.com",) for r in caplog.records)
 
 
 async def test_status_resource_reports_ready(
