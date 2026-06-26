@@ -9,29 +9,23 @@ Look up company logos and brand data via the logo.dev API.
 ## Features
 
 <!-- DOMAIN-START -->
-<!-- Replace with 3-7 bullets describing what this MCP server does. Kept across copier update. -->
-
-- **[Capability 1]** — one-sentence description of a user-visible feature.
-- **[Capability 2]** — one-sentence description of another capability.
-- **MCP tools** — N LLM-visible tools exposed; see `src/logodev_mcp/tools.py`.
-- **MCP resources** — M resources exposing domain state; see `src/logodev_mcp/resources.py`.
-- **MCP prompts** — K prompt templates; see `src/logodev_mcp/prompts.py`.
+- **Logo retrieval** (`get_logo`) — fetch a company logo as an image plus URL by domain, ticker, ISIN, crypto symbol, or brand name; supports size, format, theme, greyscale, retina, and fallback options. Requires a publishable key (`pk_…`).
+- **Brand search** (`search_brands`) — resolve a brand or company name to candidate domains and logo URLs via typeahead or exact-match. Requires a secret key (`sk_…`).
+- **Company description** (`describe_company`) — return structured company data (name, description, brand colours, social links) for a domain. Requires a secret key (`sk_…`).
+- **Full brand profile** (`get_brand`) — return the complete brand profile (logo, brandmark, banners, colours, description) for a domain — a richer superset of `describe_company`. Requires a secret key (`sk_…`).
+- **Graceful degradation** — tools are registered only when the corresponding API key is present; missing-key tools are hidden from the MCP client rather than registered and failing at call time.
 <!-- DOMAIN-END -->
 
 ## What you can do with it
 
 <!-- DOMAIN-START -->
-<!-- Replace with 3-5 concrete "you can ask Claude to X" examples. Kept across copier update. -->
-
 With this server mounted in an MCP client (Claude, etc.), you can:
 
-- **[Task 1]** — "[example user request]." Composes tools `[tool_a]` + `[tool_b]`.
-- **[Task 2]** — "[another example request]." Uses resource `[resource_x]`.
-- **[Task 3]** — "[third example]."
-
-Short, concrete prompts beat abstract feature lists — replace the
-`[Task N]` placeholders with prompts that actually work against your
-server's tool surface.
+- **Fetch a logo** — "Get the logo for stripe.com." Uses `get_logo` (publishable key required).
+- **Identify a brand's domain** — "What domain is behind the brand 'Stripe'?" Uses `search_brands` (secret key required).
+- **Look up company info** — "What colours does Stripe use in their branding?" Uses `describe_company` (secret key required).
+- **Get the full brand kit** — "Show me the complete brand profile for shopify.com." Uses `get_brand` (secret key required).
+- **Logo by ticker** — "Fetch the logo for AAPL." Uses `get_logo` with `identifier_type=ticker` (publishable key required).
 <!-- DOMAIN-END -->
 
 <!-- ===== TEMPLATE-OWNED SECTIONS BELOW — DO NOT EDIT; CHANGES WILL BE OVERWRITTEN ON COPIER UPDATE ===== -->
@@ -185,22 +179,21 @@ When `copier update` introduces new dependencies (e.g. a new extra added to `pyp
 ## Domain configuration
 
 <!-- DOMAIN-START -->
-<!-- Replace with a table of domain-specific env vars. Kept across copier update. -->
-
 Domain environment variables use the `LOGODEV_MCP_` prefix:
 
 | Variable | Default | Required | Description |
 |---|---|---|---|
-| `LOGODEV_MCP_EXAMPLE_VAR` | — | **Yes** | Replace this row with your first required setting. |
-| `LOGODEV_MCP_ANOTHER_VAR` | `default` | No | Replace with an optional setting. |
+| `LOGODEV_MCP_PUBLISHABLE_KEY` | — | Conditional | logo.dev publishable key (`pk_…`). Enables the `get_logo` tool. Omit to hide that tool. |
+| `LOGODEV_MCP_SECRET_KEY` | — | Conditional | logo.dev secret key (`sk_…`). Enables `search_brands`, `describe_company`, and `get_brand`. Omit to hide those tools. |
 
-Domain-config fields are composed inside `src/logodev_mcp/config.py` between the `CONFIG-FIELDS-START` / `CONFIG-FIELDS-END` sentinels; env reads go through `fastmcp_pvl_core.env(_ENV_PREFIX, "SUFFIX", default)` so naming stays consistent.
+At least one key must be set for any API tool to be registered. Both keys may be set simultaneously to enable all four tools.
 <!-- DOMAIN-END -->
 
 ## Key design decisions
 
 <!-- DOMAIN-START -->
-<!-- Replace with 3-6 bullets describing non-obvious architectural decisions. Kept across copier update. -->
-
-_Replace this placeholder with a short list of the non-obvious design calls this service makes — e.g. "writes are append-only", "embeddings cached in SQLite", "auth uses OIDC bearer tokens". Three to six bullets is typically enough; link out to longer ADRs under `docs/decisions/` if you maintain any._
+- **Two-key gating** — `LOGODEV_MCP_PUBLISHABLE_KEY` controls `get_logo`; `LOGODEV_MCP_SECRET_KEY` controls `search_brands`, `describe_company`, and `get_brand`. Tools for a missing key are never registered, not merely guarded at call time.
+- **Domain logic stays FastMCP-free** — `src/logodev_mcp/domain.py` contains the `Service` class and `LogoDevError` with no FastMCP imports; `src/logodev_mcp/tools.py` is the sole FastMCP layer.
+- **Errors surface as strings** — `LogoDevError` raised in domain code is caught in each tool wrapper and returned as a plain text message so the MCP client sees a readable error, not a server exception.
+- **Logo tool returns URL + image** — `get_logo` returns both the CDN URL (text) and the image bytes (image content block) unless `url_only=True`, in which case only the URL string is returned.
 <!-- DOMAIN-END -->
