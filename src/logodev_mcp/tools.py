@@ -87,7 +87,12 @@ def register_tools(mcp: FastMCP, config: ProjectConfig | None = None) -> None:
                 return exc.message
             if data is None:
                 return url
-            return [url, Image(data=data, format=_IMAGE_FORMATS[image_format])]
+            # .get() fallback keeps a future _FORMATS addition from becoming a
+            # KeyError here if its _IMAGE_FORMATS entry is forgotten.
+            image_block = Image(
+                data=data, format=_IMAGE_FORMATS.get(image_format, image_format)
+            )
+            return [url, image_block]
 
     if config.secret_key:
 

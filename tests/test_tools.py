@@ -22,6 +22,7 @@ async def test_only_logo_tool_with_publishable_only(monkeypatch: MonkeyPatch) ->
     names = await _tool_names(make_server())
     assert "get_logo" in names
     assert "search_brands" not in names
+    assert "describe_company" not in names
     assert "get_brand" not in names
 
 
@@ -71,6 +72,45 @@ async def test_get_brand_tool_maps_error_to_message(monkeypatch: MonkeyPatch) ->
         respx.get(f"{API_BASE}/brand/nike.com").mock(return_value=httpx.Response(401))
         async with Client(mcp) as client:
             result = await client.call_tool("get_brand", {"domain": "nike.com"})
+    text = " ".join(
+        b.text for b in result.content if getattr(b, "type", None) == "text"
+    )
+    assert "plan" in text.lower() or "secret" in text.lower()
+
+
+@pytest.mark.asyncio
+async def test_get_logo_tool_url_only_returns_only_url(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("LOGODEV_MCP_PUBLISHABLE_KEY", "pk_x")
+    monkeypatch.delenv("LOGODEV_MCP_SECRET_KEY", raising=False)
+    async with Client(make_server()) as client:
+        result = await client.call_tool(
+            "get_logo", {"identifier": "nike.com", "url_only": True}
+        )
+    blocks = result.content
+    assert all(getattr(b, "type", None) == "text" for b in blocks)
+    assert not any(getattr(b, "type", None) == "image" for b in blocks)
+    assert any("img.logo.dev" in b.text for b in blocks)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("tool", "path", "args"),
+    [
+        ("search_brands", "/search", {"query": "nike"}),
+        ("describe_company", "/describe/nike.com", {"domain": "nike.com"}),
+    ],
+)
+async def test_rest_tools_map_error_to_message(
+    monkeypatch: MonkeyPatch, tool: str, path: str, args: dict[str, str]
+) -> None:
+    monkeypatch.delenv("LOGODEV_MCP_PUBLISHABLE_KEY", raising=False)
+    monkeypatch.setenv("LOGODEV_MCP_SECRET_KEY", "sk_y")
+    with respx.mock:
+        respx.get(f"{API_BASE}{path}").mock(return_value=httpx.Response(401))
+        async with Client(make_server()) as client:
+            result = await client.call_tool(tool, args)
     text = " ".join(
         b.text for b in result.content if getattr(b, "type", None) == "text"
     )
