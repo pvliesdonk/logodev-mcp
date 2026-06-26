@@ -5,9 +5,31 @@ The tools registered in this server are listed below. See the
 for the full tool API.
 
 <!-- DOMAIN-TOOLS-LIST-START -->
-## ping
+Tools are registered only when the API key they need is configured (see
+[Configuration](../configuration.md)); a tool whose key is absent is hidden.
 
-Health-check tool that returns `"pong"` if the service is alive.
-Replace with real tools per the scaffold in
-`src/logodev_mcp/tools.py`.
+## `get_logo`
+
+Fetch a company logo image by domain, stock ticker, ISIN, crypto symbol, or
+brand name. Supports `size`, `format`, `theme`, `greyscale`, `retina`, and
+`fallback` options, and a `url_only` flag to return just the image URL.
+Returns the image URL plus the logo (or only the URL when `url_only`).
+**Requires the publishable key** (`LOGODEV_MCP_PUBLISHABLE_KEY`).
+
+## `search_brands`
+
+Resolve a brand or company name to candidate domains (with `suggest` or
+`match` strategy). Returns a JSON array of candidates.
+**Requires the secret key** (`LOGODEV_MCP_SECRET_KEY`).
+
+## `describe_company`
+
+Return structured company data (name, description, colours, socials) for a
+domain, as JSON. **Requires the secret key.**
+
+## `get_brand`
+
+Return the full brand profile (logo, brandmark, banners, colours, and
+description) for a domain, as JSON. A richer superset of `describe_company`.
+**Requires the secret key.**
 <!-- DOMAIN-TOOLS-LIST-END -->

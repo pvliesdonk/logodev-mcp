@@ -42,3 +42,8 @@ validators
 
 # --- Diagnostics / observability ---
 traceback
+
+# --- logo.dev / branding domain terms ---
+brandmark
+crypto
+superset
