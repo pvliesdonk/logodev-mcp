@@ -191,6 +191,8 @@ Domain environment variables use the `LOGODEV_MCP_` prefix:
 | `LOGODEV_MCP_STATE_DIR` | `/data/state` | No | Directory for the cached plan-detection verdict (`entitlements.json`). |
 
 At least one key must be set for any API tool to be registered. Both keys may be set simultaneously to enable all four tools.
+
+Which tool each logo.dev plan unlocks (`get_logo`/`search_brands` on free, `describe_company` on any paid plan, `get_brand` on Pro/Enterprise) is documented in the [plans and capabilities matrix](docs/configuration.md#plans-and-capabilities).
 <!-- DOMAIN-END -->
 
 ## Key design decisions
