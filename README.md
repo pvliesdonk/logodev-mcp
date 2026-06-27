@@ -187,6 +187,8 @@ Domain environment variables use the `LOGODEV_MCP_` prefix:
 |---|---|---|---|
 | `LOGODEV_MCP_PUBLISHABLE_KEY` | — | Conditional | logo.dev publishable key (`pk_…`). Enables the `get_logo` tool. Omit to hide that tool. |
 | `LOGODEV_MCP_SECRET_KEY` | — | Conditional | logo.dev secret key (`sk_…`). Enables `search_brands`, `describe_company`, and `get_brand`. Omit to hide those tools. |
+| `LOGODEV_MCP_DETECT_PLAN` | `true` | No | Probe `describe`/`brand` entitlement on startup and hide the tools the plan does not allow. Set `false` to skip probing and register every secret-key tool. |
+| `LOGODEV_MCP_STATE_DIR` | `/data/state` | No | Directory for the cached plan-detection verdict (`entitlements.json`). |
 
 At least one key must be set for any API tool to be registered. Both keys may be set simultaneously to enable all four tools.
 <!-- DOMAIN-END -->
@@ -195,6 +197,7 @@ At least one key must be set for any API tool to be registered. Both keys may be
 
 <!-- DOMAIN-START -->
 - **Two-key gating** — `LOGODEV_MCP_PUBLISHABLE_KEY` controls `get_logo`; `LOGODEV_MCP_SECRET_KEY` controls `search_brands`, `describe_company`, and `get_brand`. Tools for a missing key are never registered, not merely guarded at call time.
+- **Plan detection hides unentitled tools** — `describe_company` needs a paid plan and `get_brand` needs Pro/Enterprise. logo.dev has no plan endpoint, so on startup the server probes each on `logo.dev` and disables the tool on a `401`/`403`. `search_brands` is never gated; any ambiguous probe result (timeout, `5xx`, `404`, `429`) fails open and keeps the tool enabled. The verdict is cached under `LOGODEV_MCP_STATE_DIR` for 7 days (re-probed on key rotation). Disable with `LOGODEV_MCP_DETECT_PLAN=false`.
 - **Domain logic stays FastMCP-free** — `src/logodev_mcp/domain.py` contains the `Service` class and `LogoDevError` with no FastMCP imports; `src/logodev_mcp/tools.py` is the sole FastMCP layer.
 - **Errors surface as strings** — `LogoDevError` raised in domain code is caught in each tool wrapper and returned as a plain text message so the MCP client sees a readable error, not a server exception.
 - **Logo tool returns URL + image** — `get_logo` returns both the CDN URL (text) and the image bytes (image content block) unless `url_only=True`, in which case only the URL string is returned.

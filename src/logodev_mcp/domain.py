@@ -7,18 +7,36 @@ MCP (error strings, ``Image`` content).
 
 from __future__ import annotations
 
+import hashlib
+import json
 import logging
-from typing import Any
+import time
+from typing import TYPE_CHECKING, Any
 from urllib.parse import quote
 
 import httpx
 
 from logodev_mcp.config import ProjectConfig
 
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
+    from pathlib import Path
+
 logger = logging.getLogger(__name__)
 
 API_BASE = "https://api.logo.dev"
 IMG_BASE = "https://img.logo.dev"
+
+# Plan detection: probe these secret-key endpoints once at startup to learn
+# which the configured plan allows, then hide the tools it does not.
+ENTITLEMENT_PROBE_DOMAIN = "logo.dev"
+ENTITLEMENT_TTL_SECONDS = 7 * 24 * 3600
+_ENTITLEMENT_CACHE_FILE = "entitlements.json"
+# Probe name -> the tool registered for it. The tool name is also the Service
+# method used to probe it (``describe_company`` / ``get_brand``), so this single
+# mapping drives both the startup probe and the lifespan's disable call for any
+# probe name that comes back not-entitled.
+PLAN_GATED_TOOLS = {"describe": "describe_company", "brand": "get_brand"}
 
 _IDENTIFIER_PATHS = {
     "domain": "/{ident}",
@@ -61,6 +79,11 @@ class Service:
         self._img: httpx.AsyncClient | None = None
         self.has_publishable = False
         self.has_secret = False
+
+    @property
+    def config(self) -> ProjectConfig | None:
+        """The resolved config, available after :meth:`start`."""
+        return self._config
 
     async def start(self) -> None:
         """Load config (if not injected) and build the configured clients.
@@ -292,3 +315,103 @@ class Service:
             raise LogoDevError("domain must not be empty.")
         resp = await self._get(api, f"/brand/{quote(domain, safe='')}", subject=domain)
         return self._json(resp, subject=domain)
+
+    # --- plan detection ---
+
+    async def probe_entitlements(self) -> dict[str, bool]:
+        """Probe which secret-key endpoints the current plan allows.
+
+        Returns a map of probe name (``"describe"``, ``"brand"``) to an
+        entitled boolean, for endpoints with a *definitive* verdict only: HTTP
+        ``200`` -> ``True``, ``401``/``403`` -> ``False``. Any other outcome
+        (``404``/``429``/``5xx``, timeout, transport error) is *ambiguous* and
+        omitted, so the caller leaves the tool enabled (fail open). A cached
+        verdict is reused while fresh (``ENTITLEMENT_TTL_SECONDS``); newly
+        probed verdicts are persisted. Returns ``{}`` with no secret key.
+        """
+        if not self.has_secret or self._api is None:
+            return {}
+        cached = self._read_entitlement_cache()
+        result: dict[str, bool] = {}
+        probed_live = False
+        # PLAN_GATED_TOOLS is the single source of truth: the tool name is also
+        # the Service method that backs it, so one mapping drives both the probe
+        # here and the disable in the lifespan.
+        for name, tool_name in PLAN_GATED_TOOLS.items():
+            if name in cached:
+                result[name] = cached[name]
+                continue
+            probe: Callable[[str], Awaitable[Any]] = getattr(self, tool_name)
+            verdict = await self._probe_endpoint(probe(ENTITLEMENT_PROBE_DOMAIN))
+            if verdict is not None:
+                result[name] = verdict
+                probed_live = True
+        if probed_live:
+            self._write_entitlement_cache(result)
+        return result
+
+    @staticmethod
+    async def _probe_endpoint(probe: Awaitable[Any]) -> bool | None:
+        """Await one probe; ``True``/``False`` for a definitive verdict, else
+        ``None`` (ambiguous — caller fails open)."""
+        try:
+            await probe
+        except LogoDevError as exc:
+            if exc.status in (401, 403):
+                return False
+            return None
+        return True
+
+    def _entitlement_cache_path(self) -> Path | None:
+        if self._config is None:
+            return None
+        return self._config.state_dir / _ENTITLEMENT_CACHE_FILE
+
+    def _key_fingerprint(self) -> str:
+        """Stable, non-reversible id of the secret key so a rotated key
+        invalidates the cache without ever storing the key itself."""
+        key = self._config.secret_key if self._config else None
+        return hashlib.sha256((key or "").encode()).hexdigest()[:16]
+
+    def _read_entitlement_cache(self) -> dict[str, bool]:
+        """Return cached definitive verdicts that are fresh and match the
+        current key, else ``{}`` (missing, corrupt, stale, or rotated key)."""
+        path = self._entitlement_cache_path()
+        if path is None:
+            return {}
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return {}
+        if not isinstance(data, dict):
+            return {}
+        if data.get("key_fingerprint") != self._key_fingerprint():
+            return {}
+        checked_at = data.get("checked_at")
+        if not isinstance(checked_at, int | float):
+            return {}
+        age = time.time() - checked_at
+        if age < 0 or age > ENTITLEMENT_TTL_SECONDS:
+            return {}
+        ents = data.get("entitlements")
+        if not isinstance(ents, dict):
+            return {}
+        return {k: v for k, v in ents.items() if isinstance(v, bool)}
+
+    def _write_entitlement_cache(self, entitlements: dict[str, bool]) -> None:
+        """Persist verdicts atomically; never raise on an unwritable dir."""
+        path = self._entitlement_cache_path()
+        if path is None or not entitlements:
+            return
+        payload = {
+            "key_fingerprint": self._key_fingerprint(),
+            "checked_at": time.time(),
+            "entitlements": entitlements,
+        }
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = path.with_name(path.name + ".tmp")
+            tmp.write_text(json.dumps(payload), encoding="utf-8")
+            tmp.replace(path)
+        except OSError:
+            logger.debug("entitlement_cache_write_failed path=%s", path, exc_info=True)
