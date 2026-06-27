@@ -307,6 +307,83 @@ async def test_rest_methods_map_401() -> None:
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("status", "upstream_msg"),
+    [
+        (401, "api not available for free accounts. upgrade your account"),
+        (403, "the brand API is available on Pro and Enterprise plans"),
+    ],
+)
+async def test_rest_methods_surface_upstream_msg(
+    status: int, upstream_msg: str
+) -> None:
+    # logo.dev returns a descriptive ``msg`` on 401/403; relay it verbatim
+    # instead of a generic key-blaming string.
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(f"{API_BASE}/brand/nike.com").mock(
+                return_value=httpx.Response(status, json={"msg": upstream_msg})
+            )
+            with pytest.raises(LogoDevError) as exc:
+                await service.get_brand("nike.com")
+        assert exc.value.status == status
+        assert upstream_msg in exc.value.message
+        # The misleading "check your key" generic must not bury the real reason.
+        assert "LOGODEV_MCP_SECRET_KEY" not in exc.value.message
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "body",
+    [
+        {"error": "forbidden"},  # dict, no ``msg`` key
+        {"msg": ""},  # blank msg
+        {"msg": "   "},  # whitespace-only msg
+        {"msg": 123},  # non-string msg
+        ["forbidden"],  # non-dict JSON body
+    ],
+)
+async def test_rest_methods_fall_back_when_msg_unusable(body: object) -> None:
+    # A JSON body without a usable ``msg`` (missing, blank, non-string, or a
+    # non-object body) falls back to the generic message rather than raising.
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(f"{API_BASE}/brand/nike.com").mock(
+                return_value=httpx.Response(403, json=body)
+            )
+            with pytest.raises(LogoDevError) as exc:
+                await service.get_brand("nike.com")
+        assert exc.value.status == 403
+        assert "LOGODEV_MCP_SECRET_KEY" in exc.value.message
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_rest_methods_strip_surrounding_whitespace_from_msg() -> None:
+    # The relayed message is stripped — an equality assertion guards against a
+    # regression that a substring check would miss.
+    service = _api_service()
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(f"{API_BASE}/brand/nike.com").mock(
+                return_value=httpx.Response(403, json={"msg": "  upgrade your plan  "})
+            )
+            with pytest.raises(LogoDevError) as exc:
+                await service.get_brand("nike.com")
+        assert exc.value.message == "logo.dev: upgrade your plan"
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
 async def test_rest_methods_require_secret_key() -> None:
     service = Service(ProjectConfig())  # no keys
     await service.start()

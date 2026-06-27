@@ -117,6 +117,13 @@ class Service:
         # only sees the returned message, so this is the operator's trace.
         logger.warning("logodev_http_error status=%s subject=%s", code, subject)
         if code in (401, 403):
+            # logo.dev's body carries a precise reason (e.g. "api not available
+            # for free accounts" vs "the brand API is available on Pro and
+            # Enterprise plans"). Relay it so operators aren't misdirected to
+            # the key when the key is valid and the plan is the real limit.
+            detail = self._error_detail(resp)
+            if detail is not None:
+                raise LogoDevError(f"logo.dev: {detail}", status=code)
             raise LogoDevError(
                 "Authentication or plan-tier problem — check your "
                 "LOGODEV_MCP_SECRET_KEY and that your plan includes this "
@@ -128,6 +135,23 @@ class Service:
         if code == 429:
             raise LogoDevError("logo.dev rate limit reached — retry later.", status=429)
         raise LogoDevError(f"logo.dev error: {code} {resp.text}", status=code)
+
+    def _error_detail(self, resp: httpx.Response) -> str | None:
+        """Extract logo.dev's human-readable error ``msg``, if the body has one.
+
+        Returns the stripped ``msg`` string for a JSON object that carries a
+        non-empty one, else ``None`` (non-JSON body, non-object, missing or
+        blank ``msg``) so the caller can fall back to a generic message.
+        """
+        try:
+            body = resp.json()
+        except ValueError:  # json.JSONDecodeError is a ValueError subclass
+            return None
+        if isinstance(body, dict):
+            msg = body.get("msg")
+            if isinstance(msg, str) and msg.strip():
+                return msg.strip()
+        return None
 
     async def _get(
         self,
