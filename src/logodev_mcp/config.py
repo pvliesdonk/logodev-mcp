@@ -10,11 +10,14 @@ update preserves that block across template updates.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from fastmcp_pvl_core import (
     ServerConfig,
     env,
 )
+
+_TRUTHY = {"1", "true", "yes", "on"}
 
 _ENV_PREFIX = "LOGODEV_MCP"
 
@@ -32,6 +35,10 @@ class ProjectConfig:
     # vault_path: Path = Path("/data/vault")
     publishable_key: str | None = None
     secret_key: str | None = None
+    # Plan-tier gating: probe describe/brand entitlement on startup and hide the
+    # tools the plan does not allow.  ``state_dir`` holds the cached verdict.
+    detect_plan: bool = True
+    state_dir: Path = Path("/data/state")
     # CONFIG-FIELDS-END
 
     @classmethod
@@ -44,5 +51,12 @@ class ProjectConfig:
             # vault_path=Path(env(_ENV_PREFIX, "VAULT_PATH", "/data/vault")),
             publishable_key=env(_ENV_PREFIX, "PUBLISHABLE_KEY"),
             secret_key=env(_ENV_PREFIX, "SECRET_KEY"),
+            detect_plan=(env(_ENV_PREFIX, "DETECT_PLAN", "true") or "true")
+            .strip()
+            .lower()
+            in _TRUTHY,
+            state_dir=Path(
+                env(_ENV_PREFIX, "STATE_DIR", "/data/state") or "/data/state"
+            ),
             # CONFIG-FROM-ENV-END
         )

@@ -20,8 +20,15 @@ registered; tools whose key is absent are hidden.
 |---|---|---|
 | `LOGODEV_MCP_PUBLISHABLE_KEY` | Conditional | Publishable key (`pk_...`). Enables the `get_logo` tool. |
 | `LOGODEV_MCP_SECRET_KEY` | Conditional | Secret key (`sk_...`). Enables `search_brands`, `describe_company`, and `get_brand`. |
+| `LOGODEV_MCP_DETECT_PLAN` | Optional (default `true`) | Probe `describe`/`brand` entitlement on startup and hide tools the plan does not allow. Set `false` to register every secret-key tool regardless of plan. |
+| `LOGODEV_MCP_STATE_DIR` | Optional (default `/data/state`) | Directory holding the cached plan-detection verdict. |
 
 Get keys from the [logo.dev dashboard](https://www.logo.dev). The publishable
 key is sent as a query token to the image CDN; the secret key is sent as a
 bearer token to the REST API.
+
+When plan detection is on, `describe_company` and `get_brand` are hidden unless
+the configured plan entitles them (`describe` needs any paid plan, `brand` needs
+Pro or Enterprise). The verdict is cached for 7 days under the state directory;
+a transient probe failure leaves the tools enabled.
 <!-- DOMAIN-CONFIG-VARS-END -->

@@ -1,11 +1,25 @@
 from __future__ import annotations
 
+import hashlib
+import json
+import time
+from typing import TYPE_CHECKING
+
 import httpx
 import pytest
 import respx
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 from logodev_mcp.config import ProjectConfig
-from logodev_mcp.domain import API_BASE, IMG_BASE, LogoDevError, Service
+from logodev_mcp.domain import (
+    API_BASE,
+    ENTITLEMENT_PROBE_DOMAIN,
+    IMG_BASE,
+    LogoDevError,
+    Service,
+)
 
 
 @pytest.mark.asyncio
@@ -427,6 +441,285 @@ async def test_search_brands_maps_connect_error() -> None:
             with pytest.raises(LogoDevError) as exc:
                 await service.search_brands("nike")
         assert "Cannot reach" in exc.value.message
+    finally:
+        await service.stop()
+
+
+# --- entitlement probing (plan detection) ---
+
+_DESCRIBE_URL = f"{API_BASE}/describe/{ENTITLEMENT_PROBE_DOMAIN}"
+_BRAND_URL = f"{API_BASE}/brand/{ENTITLEMENT_PROBE_DOMAIN}"
+
+
+def _probe_service(state_dir: Path, *, secret_key: str = "sk_test") -> Service:
+    return Service(ProjectConfig(secret_key=secret_key, state_dir=state_dir))
+
+
+def _fingerprint(secret_key: str) -> str:
+    return hashlib.sha256(secret_key.encode()).hexdigest()[:16]
+
+
+def _write_cache(
+    state_dir: Path,
+    entitlements: dict[str, bool],
+    *,
+    secret_key: str = "sk_test",
+    age_seconds: float = 0.0,
+) -> Path:
+    path = state_dir / "entitlements.json"
+    path.write_text(
+        json.dumps(
+            {
+                "key_fingerprint": _fingerprint(secret_key),
+                "checked_at": time.time() - age_seconds,
+                "entitlements": entitlements,
+            }
+        ),
+        encoding="utf-8",
+    )
+    return path
+
+
+@pytest.mark.asyncio
+async def test_probe_entitlements_both_available_and_cached(tmp_path: Path) -> None:
+    service = _probe_service(tmp_path)
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(_DESCRIBE_URL).mock(return_value=httpx.Response(200, json={}))
+            respx.get(_BRAND_URL).mock(return_value=httpx.Response(200, json={}))
+            result = await service.probe_entitlements()
+        assert result == {"describe": True, "brand": True}
+        cached = json.loads((tmp_path / "entitlements.json").read_text())
+        assert cached["entitlements"] == {"describe": True, "brand": True}
+        assert cached["key_fingerprint"] == _fingerprint("sk_test")
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_probe_entitlements_both_denied(tmp_path: Path) -> None:
+    service = _probe_service(tmp_path)
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(_DESCRIBE_URL).mock(return_value=httpx.Response(401, json={}))
+            respx.get(_BRAND_URL).mock(return_value=httpx.Response(403, json={}))
+            result = await service.probe_entitlements()
+        assert result == {"describe": False, "brand": False}
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_probe_entitlements_mixed(tmp_path: Path) -> None:
+    service = _probe_service(tmp_path)
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(_DESCRIBE_URL).mock(return_value=httpx.Response(200, json={}))
+            respx.get(_BRAND_URL).mock(return_value=httpx.Response(403, json={}))
+            result = await service.probe_entitlements()
+        assert result == {"describe": True, "brand": False}
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("status", [404, 429, 500])
+async def test_probe_entitlements_ambiguous_status_omitted(
+    tmp_path: Path, status: int
+) -> None:
+    # Anything other than 200/401/403 is ambiguous — omit it (fail open),
+    # never treat it as "denied". 404 in particular must not hide a tool.
+    service = _probe_service(tmp_path)
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(_DESCRIBE_URL).mock(return_value=httpx.Response(status, json={}))
+            respx.get(_BRAND_URL).mock(return_value=httpx.Response(200, json={}))
+            result = await service.probe_entitlements()
+        assert "describe" not in result
+        assert result["brand"] is True
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "error",
+    [httpx.ConnectError("refused"), httpx.ConnectTimeout("slow")],
+)
+async def test_probe_entitlements_network_error_omitted(
+    tmp_path: Path, error: Exception
+) -> None:
+    # Transport errors and timeouts both fail open (omitted), never "denied".
+    service = _probe_service(tmp_path)
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(_DESCRIBE_URL).mock(side_effect=error)
+            respx.get(_BRAND_URL).mock(return_value=httpx.Response(403, json={}))
+            result = await service.probe_entitlements()
+        assert result == {"brand": False}
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_probe_entitlements_merges_partial_fresh_cache(tmp_path: Path) -> None:
+    # A fresh cache covering only one probe (the realistic state when the other
+    # was ambiguous last run): the cached one is reused without HTTP, the missing
+    # one is probed live, and the merged verdict is persisted.
+    _write_cache(tmp_path, {"describe": True})
+    service = _probe_service(tmp_path)
+    await service.start()
+    try:
+        with respx.mock:
+            describe = respx.get(_DESCRIBE_URL).mock(
+                return_value=httpx.Response(200, json={})
+            )
+            respx.get(_BRAND_URL).mock(return_value=httpx.Response(200, json={}))
+            result = await service.probe_entitlements()
+        assert result == {"describe": True, "brand": True}
+        assert describe.called is False  # cached describe must not be re-probed
+        merged = json.loads((tmp_path / "entitlements.json").read_text())
+        assert merged["entitlements"] == {"describe": True, "brand": True}
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_probe_entitlements_no_secret_returns_empty(tmp_path: Path) -> None:
+    service = Service(ProjectConfig(state_dir=tmp_path))  # no secret key
+    await service.start()
+    try:
+        with respx.mock:
+            route = respx.get(url__startswith=API_BASE).mock(
+                return_value=httpx.Response(200, json={})
+            )
+            result = await service.probe_entitlements()
+        assert result == {}
+        assert route.called is False
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_probe_entitlements_uses_fresh_cache_without_http(tmp_path: Path) -> None:
+    _write_cache(tmp_path, {"describe": True, "brand": False})
+    service = _probe_service(tmp_path)
+    await service.start()
+    try:
+        with respx.mock:
+            route = respx.get(url__startswith=API_BASE).mock(
+                return_value=httpx.Response(200, json={})
+            )
+            result = await service.probe_entitlements()
+        assert result == {"describe": True, "brand": False}
+        assert route.called is False
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_probe_entitlements_reprobes_stale_cache(tmp_path: Path) -> None:
+    _write_cache(
+        tmp_path, {"describe": False, "brand": False}, age_seconds=8 * 24 * 3600
+    )
+    service = _probe_service(tmp_path)
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(_DESCRIBE_URL).mock(return_value=httpx.Response(200, json={}))
+            respx.get(_BRAND_URL).mock(return_value=httpx.Response(200, json={}))
+            result = await service.probe_entitlements()
+        assert result == {"describe": True, "brand": True}
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_probe_entitlements_ignores_cache_for_different_key(
+    tmp_path: Path,
+) -> None:
+    _write_cache(tmp_path, {"describe": False, "brand": False}, secret_key="sk_other")
+    service = _probe_service(tmp_path, secret_key="sk_test")
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(_DESCRIBE_URL).mock(return_value=httpx.Response(200, json={}))
+            respx.get(_BRAND_URL).mock(return_value=httpx.Response(200, json={}))
+            result = await service.probe_entitlements()
+        assert result == {"describe": True, "brand": True}
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_probe_entitlements_ignores_corrupt_cache(tmp_path: Path) -> None:
+    (tmp_path / "entitlements.json").write_text("{not json", encoding="utf-8")
+    service = _probe_service(tmp_path)
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(_DESCRIBE_URL).mock(return_value=httpx.Response(401, json={}))
+            respx.get(_BRAND_URL).mock(return_value=httpx.Response(403, json={}))
+            result = await service.probe_entitlements()
+        assert result == {"describe": False, "brand": False}
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "payload",
+    [
+        "[]",  # valid JSON but not an object
+        '{"key_fingerprint": "FP", "checked_at": "soon", "entitlements": {}}',
+        '{"key_fingerprint": "FP", "checked_at": 0, "entitlements": ["x"]}',
+        # well-formed envelope but a non-bool value: the bad key is dropped and
+        # re-probed rather than trusted as a truthy "entitled".
+        '{"key_fingerprint": "FP", "checked_at": NOW,'
+        ' "entitlements": {"describe": "yes", "brand": true}}',
+    ],
+)
+async def test_probe_entitlements_ignores_malformed_cache(
+    tmp_path: Path, payload: str
+) -> None:
+    # A structurally-wrong cache (non-object, bad timestamp type, non-object
+    # entitlements, or a non-bool value) is treated as a miss and re-probed,
+    # never crashing or trusting the bad value.
+    payload = payload.replace("FP", _fingerprint("sk_test")).replace(
+        "NOW", str(time.time())
+    )
+    (tmp_path / "entitlements.json").write_text(payload, encoding="utf-8")
+    service = _probe_service(tmp_path)
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(_DESCRIBE_URL).mock(return_value=httpx.Response(200, json={}))
+            respx.get(_BRAND_URL).mock(return_value=httpx.Response(200, json={}))
+            result = await service.probe_entitlements()
+        assert result == {"describe": True, "brand": True}
+    finally:
+        await service.stop()
+
+
+@pytest.mark.asyncio
+async def test_probe_entitlements_survives_unwritable_cache_dir(tmp_path: Path) -> None:
+    # state_dir points at a path whose parent is a file, so mkdir/write fails;
+    # the probe must still return its verdict without raising.
+    blocker = tmp_path / "blocker"
+    blocker.write_text("x", encoding="utf-8")
+    service = _probe_service(blocker / "state")
+    await service.start()
+    try:
+        with respx.mock:
+            respx.get(_DESCRIBE_URL).mock(return_value=httpx.Response(200, json={}))
+            respx.get(_BRAND_URL).mock(return_value=httpx.Response(403, json={}))
+            result = await service.probe_entitlements()
+        assert result == {"describe": True, "brand": False}
     finally:
         await service.stop()
 

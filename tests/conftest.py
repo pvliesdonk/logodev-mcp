@@ -14,10 +14,16 @@ from logodev_mcp.server import make_server
 
 @pytest.fixture(autouse=True)
 def _clear_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Strip all ``LOGODEV_MCP_*`` env vars before each test."""
+    """Strip all ``LOGODEV_MCP_*`` env vars before each test.
+
+    Plan detection defaults off so server-building tests never probe the real
+    logo.dev API on startup; tests that exercise plan gating opt back in with
+    ``LOGODEV_MCP_DETECT_PLAN=true`` and mock the HTTP calls.
+    """
     for key in list(os.environ):
         if key.startswith("LOGODEV_MCP_"):
             monkeypatch.delenv(key, raising=False)
+    monkeypatch.setenv("LOGODEV_MCP_DETECT_PLAN", "false")
 
 
 @pytest.fixture

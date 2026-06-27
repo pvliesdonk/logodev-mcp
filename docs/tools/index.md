@@ -39,4 +39,9 @@ error.
 When logo.dev rejects a request for an authentication or plan reason, the tool
 relays logo.dev's own message verbatim (prefixed `logo.dev:`). A valid secret
 key on too low a plan is a plan problem, not a key problem.
+
+With plan detection on (the default), the server probes these two endpoints at
+startup and **hides whichever the plan does not allow**, so they only appear
+when callable. Set `LOGODEV_MCP_DETECT_PLAN=false` to always register them. See
+[Configuration](../configuration.md).
 <!-- DOMAIN-TOOLS-LIST-END -->
