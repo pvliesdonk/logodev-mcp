@@ -1099,11 +1099,17 @@ Returns the image URL plus the logo (or only the URL when <code>url_only</code>)
 <strong>Requires the secret key</strong> (<code>LOGODEV_MCP_SECRET_KEY</code>).</p>
 <h2 id="describe_company"><code>describe_company</code><a class="headerlink" href="#describe_company" title="Permanent link">&para;</a></h2>
 <p>Return structured company data (name, description, colours, socials) for a
-domain, as JSON. <strong>Requires the secret key.</strong></p>
+domain, as JSON. <strong>Requires the secret key</strong> and a <strong>paid logo.dev plan</strong>.
+Free accounts get a <code>logo.dev: api not available for free accounts</code> error.</p>
 <h2 id="get_brand"><code>get_brand</code><a class="headerlink" href="#get_brand" title="Permanent link">&para;</a></h2>
 <p>Return the full brand profile (logo, brandmark, banners, colours, and
 description) for a domain, as JSON. A richer superset of <code>describe_company</code>.
-<strong>Requires the secret key.</strong></p>
+<strong>Requires the secret key</strong> and a <strong>logo.dev Pro or Enterprise plan</strong>. Lower
+tiers get a <code>logo.dev: the brand API is available on Pro and Enterprise plans</code>
+error.</p>
+<p>When logo.dev rejects a request for an authentication or plan reason, the tool
+relays logo.dev's own message verbatim (prefixed <code>logo.dev:</code>). A valid secret
+key on too low a plan is a plan problem, not a key problem.</p>
 <!-- DOMAIN-TOOLS-LIST-END -->
 
 
