@@ -8,7 +8,9 @@
   "secretKeys": [
     "LOGODEV_MCP_PUBLISHABLE_KEY",
     "LOGODEV_MCP_SECRET_KEY",
-    "LOGODEV_MCP_BEARER_TOKEN"
+    "LOGODEV_MCP_BEARER_TOKEN",
+    "LOGODEV_MCP_OIDC_CLIENT_SECRET",
+    "LOGODEV_MCP_OIDC_JWT_SIGNING_KEY"
   ],
   "questions": [
     {
@@ -31,9 +33,54 @@
     {
       "id": "secret_key",
       "label": "logo.dev secret key",
-      "help": "sk_... key from the logo.dev dashboard. Enables search_brands, describe_company, and get_brand. Leave blank to hide them.",
+      "help": "sk_... key from the logo.dev dashboard. Enables search_brands, describe_company, and get_brand (subject to your plan). Leave blank to hide them.",
       "type": "text",
       "var": "LOGODEV_MCP_SECRET_KEY"
+    },
+    {
+      "id": "detect_plan",
+      "label": "Detect plan and hide unentitled tools",
+      "help": "On by default: probe describe/brand at startup and hide the tools your logo.dev plan does not allow. Turn off to always register every secret-key tool.",
+      "type": "bool",
+      "var": "LOGODEV_MCP_DETECT_PLAN",
+      "advancedGroup": "Plan detection"
+    },
+    {
+      "id": "state_dir",
+      "label": "State directory",
+      "help": "Holds the cached plan-detection verdict (entitlements.json). On Docker this is fixed to the state volume.",
+      "type": "text",
+      "var": "LOGODEV_MCP_STATE_DIR",
+      "advancedGroup": "Plan detection",
+      "dockerPath": "/data/state"
+    },
+    {
+      "id": "base_url",
+      "label": "Public base URL",
+      "help": "e.g. https://mcp.example.com — required for OIDC and MCP Apps.",
+      "type": "text",
+      "var": "LOGODEV_MCP_BASE_URL",
+      "showIf": { "deployment": ["server"] }
+    },
+    {
+      "id": "http_path",
+      "label": "HTTP endpoint path",
+      "type": "text",
+      "var": "LOGODEV_MCP_HTTP_PATH",
+      "showIf": { "deployment": ["server"] },
+      "advancedGroup": "Server"
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "type": "select",
+      "showIf": { "deployment": ["server"] },
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "bearer", "label": "Bearer token" },
+        { "value": "oidc", "label": "OIDC" },
+        { "value": "both", "label": "Bearer + OIDC" }
+      ]
     },
     {
       "id": "bearer_token",
@@ -41,7 +88,70 @@
       "help": "Any non-empty string enables bearer auth. Browser-only.",
       "type": "text",
       "var": "LOGODEV_MCP_BEARER_TOKEN",
-      "showIf": { "deployment": ["server"] }
+      "showIf": { "auth": ["bearer", "both"] }
+    },
+    {
+      "id": "oidc_config_url",
+      "label": "OIDC discovery URL",
+      "help": "e.g. https://auth.example.com/.well-known/openid-configuration",
+      "type": "text",
+      "var": "LOGODEV_MCP_OIDC_CONFIG_URL",
+      "showIf": { "auth": ["oidc", "both"] }
+    },
+    {
+      "id": "oidc_client_id",
+      "label": "OIDC client ID",
+      "type": "text",
+      "var": "LOGODEV_MCP_OIDC_CLIENT_ID",
+      "showIf": { "auth": ["oidc", "both"] }
+    },
+    {
+      "id": "oidc_client_secret",
+      "label": "OIDC client secret",
+      "help": "Browser-only; never in the shareable link.",
+      "type": "text",
+      "var": "LOGODEV_MCP_OIDC_CLIENT_SECRET",
+      "showIf": { "auth": ["oidc", "both"] }
+    },
+    {
+      "id": "oidc_jwt_signing_key",
+      "label": "OIDC JWT signing key",
+      "help": "Required on Linux/Docker — the default is ephemeral and invalidates tokens on restart. Generate: openssl rand -hex 32.",
+      "type": "text",
+      "var": "LOGODEV_MCP_OIDC_JWT_SIGNING_KEY",
+      "showIf": { "auth": ["oidc", "both"] }
+    },
+    {
+      "id": "oidc_audience",
+      "label": "OIDC audience",
+      "type": "text",
+      "var": "LOGODEV_MCP_OIDC_AUDIENCE",
+      "showIf": { "auth": ["oidc", "both"] },
+      "advancedGroup": "Auth"
+    },
+    {
+      "id": "oidc_required_scopes",
+      "label": "OIDC required scopes (CSV)",
+      "type": "text",
+      "var": "LOGODEV_MCP_OIDC_REQUIRED_SCOPES",
+      "showIf": { "auth": ["oidc", "both"] },
+      "advancedGroup": "Auth"
+    },
+    {
+      "id": "oidc_verify_access_token",
+      "label": "Verify access token (not id token)",
+      "type": "bool",
+      "var": "LOGODEV_MCP_OIDC_VERIFY_ACCESS_TOKEN",
+      "showIf": { "auth": ["oidc", "both"] },
+      "advancedGroup": "Auth"
+    },
+    {
+      "id": "kv_store_url",
+      "label": "KV store URL (HTTP session persistence)",
+      "type": "text",
+      "var": "LOGODEV_MCP_KV_STORE_URL",
+      "showIf": { "deployment": ["server"] },
+      "advancedGroup": "Persistence"
     },
     {
       "id": "log_level",
@@ -58,5 +168,11 @@
       "advancedGroup": "Logging"
     }
   ],
-  "guards": []
+  "guards": [
+    {
+      "when": { "deployment": ["server"], "auth": ["oidc", "both"] },
+      "level": "warning",
+      "message": "OIDC needs BASE_URL set and (on Linux/Docker) OIDC_JWT_SIGNING_KEY — the default key is ephemeral and invalidates tokens on restart."
+    }
+  ]
 }
