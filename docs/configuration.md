@@ -10,6 +10,18 @@ variables (`LOGODEV_MCP_TRANSPORT`, `LOGODEV_MCP_HOST`,
 `LOGODEV_MCP_PORT`, `LOGODEV_MCP_HTTP_PATH`,
 `LOGODEV_MCP_BASE_URL`, auth vars, etc.).
 
+## Server identity
+
+These two are read by the scaffold's `make_server()` (not by
+`ServerConfig`), so an operator can rename an instance or override its
+instructions without editing template-owned code:
+
+- `LOGODEV_MCP_SERVER_NAME`: the server name reported to clients and
+  by `get_server_info`. Defaults to `logodev-mcp`.
+- `LOGODEV_MCP_INSTRUCTIONS`: replaces the default MCP instructions
+  text. Unset, the scaffold builds the default (which advertises this
+  override).
+
 <!-- DOMAIN-CONFIG-VARS-START -->
 ## Domain variables
 

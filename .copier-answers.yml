@@ -1,5 +1,5 @@
 # Changes here will be overwritten by `copier update`.
-_commit: v2.5.3
+_commit: v2.6.0
 _src_path: gh:pvliesdonk/fastmcp-server-template
 docker_registry: ghcr.io/pvliesdonk
 domain_description: Look up company logos and brand data via the logo.dev API.

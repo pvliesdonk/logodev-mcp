@@ -19,8 +19,8 @@
       "help": "Local stdio for Claude Desktop/Code, or an HTTP server for Docker/systemd.",
       "type": "select",
       "options": [
-        { "value": "local", "label": "Local (Claude Desktop / Claude Code, stdio)" },
-        { "value": "server", "label": "Server (HTTP — Docker / Compose / systemd)" }
+        { "value": "local", "label": "Local (Claude Desktop / Claude Code, stdio)", "emit": { "LOGODEV_MCP_TRANSPORT": "stdio" } },
+        { "value": "server", "label": "Server (HTTP — Docker / Compose / systemd)", "emit": { "LOGODEV_MCP_TRANSPORT": "http" } }
       ]
     },
     {
@@ -65,8 +65,27 @@
     {
       "id": "http_path",
       "label": "HTTP endpoint path",
+      "help": "Mount path for the MCP endpoint, e.g. /mcp. Defaults to /mcp when unset.",
       "type": "text",
       "var": "LOGODEV_MCP_HTTP_PATH",
+      "showIf": { "deployment": ["server"] },
+      "advancedGroup": "Server"
+    },
+    {
+      "id": "host",
+      "label": "Bind host",
+      "help": "Interface the HTTP server binds to. Default 127.0.0.1.",
+      "type": "text",
+      "var": "LOGODEV_MCP_HOST",
+      "showIf": { "deployment": ["server"] },
+      "advancedGroup": "Server"
+    },
+    {
+      "id": "port",
+      "label": "Port",
+      "help": "TCP port for the HTTP server. Default 8000.",
+      "type": "text",
+      "var": "LOGODEV_MCP_PORT",
       "showIf": { "deployment": ["server"] },
       "advancedGroup": "Server"
     },
@@ -88,7 +107,7 @@
       "help": "Any non-empty string enables bearer auth. Browser-only.",
       "type": "text",
       "var": "LOGODEV_MCP_BEARER_TOKEN",
-      "showIf": { "auth": ["bearer", "both"] }
+      "showIf": { "deployment": ["server"], "auth": ["bearer", "both"] }
     },
     {
       "id": "oidc_config_url",
@@ -96,14 +115,14 @@
       "help": "e.g. https://auth.example.com/.well-known/openid-configuration",
       "type": "text",
       "var": "LOGODEV_MCP_OIDC_CONFIG_URL",
-      "showIf": { "auth": ["oidc", "both"] }
+      "showIf": { "deployment": ["server"], "auth": ["oidc", "both"] }
     },
     {
       "id": "oidc_client_id",
       "label": "OIDC client ID",
       "type": "text",
       "var": "LOGODEV_MCP_OIDC_CLIENT_ID",
-      "showIf": { "auth": ["oidc", "both"] }
+      "showIf": { "deployment": ["server"], "auth": ["oidc", "both"] }
     },
     {
       "id": "oidc_client_secret",
@@ -111,7 +130,7 @@
       "help": "Browser-only; never in the shareable link.",
       "type": "text",
       "var": "LOGODEV_MCP_OIDC_CLIENT_SECRET",
-      "showIf": { "auth": ["oidc", "both"] }
+      "showIf": { "deployment": ["server"], "auth": ["oidc", "both"] }
     },
     {
       "id": "oidc_jwt_signing_key",
@@ -119,14 +138,14 @@
       "help": "Required on Linux/Docker — the default is ephemeral and invalidates tokens on restart. Generate: openssl rand -hex 32.",
       "type": "text",
       "var": "LOGODEV_MCP_OIDC_JWT_SIGNING_KEY",
-      "showIf": { "auth": ["oidc", "both"] }
+      "showIf": { "deployment": ["server"], "auth": ["oidc", "both"] }
     },
     {
       "id": "oidc_audience",
       "label": "OIDC audience",
       "type": "text",
       "var": "LOGODEV_MCP_OIDC_AUDIENCE",
-      "showIf": { "auth": ["oidc", "both"] },
+      "showIf": { "deployment": ["server"], "auth": ["oidc", "both"] },
       "advancedGroup": "Auth"
     },
     {
@@ -134,7 +153,7 @@
       "label": "OIDC required scopes (CSV)",
       "type": "text",
       "var": "LOGODEV_MCP_OIDC_REQUIRED_SCOPES",
-      "showIf": { "auth": ["oidc", "both"] },
+      "showIf": { "deployment": ["server"], "auth": ["oidc", "both"] },
       "advancedGroup": "Auth"
     },
     {
@@ -142,7 +161,25 @@
       "label": "Verify access token (not id token)",
       "type": "bool",
       "var": "LOGODEV_MCP_OIDC_VERIFY_ACCESS_TOKEN",
-      "showIf": { "auth": ["oidc", "both"] },
+      "showIf": { "deployment": ["server"], "auth": ["oidc", "both"] },
+      "advancedGroup": "Auth"
+    },
+    {
+      "id": "bearer_tokens_file",
+      "label": "Bearer tokens file (TOML)",
+      "help": "Path to a TOML file of per-token subjects; overrides the single BEARER_TOKEN.",
+      "type": "text",
+      "var": "LOGODEV_MCP_BEARER_TOKENS_FILE",
+      "showIf": { "deployment": ["server"], "auth": ["bearer", "both"] },
+      "advancedGroup": "Auth"
+    },
+    {
+      "id": "bearer_default_subject",
+      "label": "Bearer default subject",
+      "help": "Subject assigned to the single bearer token. Default bearer-anon.",
+      "type": "text",
+      "var": "LOGODEV_MCP_BEARER_DEFAULT_SUBJECT",
+      "showIf": { "deployment": ["server"], "auth": ["bearer", "both"] },
       "advancedGroup": "Auth"
     },
     {
@@ -152,6 +189,24 @@
       "var": "LOGODEV_MCP_KV_STORE_URL",
       "showIf": { "deployment": ["server"] },
       "advancedGroup": "Persistence"
+    },
+    {
+      "id": "event_store_url",
+      "label": "Event store URL (HTTP resumability)",
+      "help": "Alternative event-store URL for HTTP resumability; prefer KV_STORE_URL for new deployments.",
+      "type": "text",
+      "var": "LOGODEV_MCP_EVENT_STORE_URL",
+      "showIf": { "deployment": ["server"] },
+      "advancedGroup": "Persistence"
+    },
+    {
+      "id": "app_domain",
+      "label": "MCP Apps domain",
+      "help": "Public domain that serves MCP Apps UI resources.",
+      "type": "text",
+      "var": "LOGODEV_MCP_APP_DOMAIN",
+      "showIf": { "deployment": ["server"] },
+      "advancedGroup": "MCP Apps"
     },
     {
       "id": "log_level",
