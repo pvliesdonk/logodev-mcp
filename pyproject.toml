@@ -1,6 +1,6 @@
 [project]
 name = "logodev-mcp"
-version = "1.0.2"
+version = "1.1.0"
 description = "Look up company logos and brand data via the logo.dev API."
 readme = "README.md"
 license = "MIT"
