@@ -1,7 +1,19 @@
 name: "CodeQL config"
 
-query-filters:
-  - exclude:
-      id: py/clear-text-storage-of-sensitive-information
-      paths:
-        - src/logodev_mcp/git.py
+# Add project-specific CodeQL tuning here.  Two mechanisms exist, with
+# different granularity:
+#
+# - `paths-ignore:` (top level, this file) skips files from analysis
+#   entirely — every rule, so reserve it for generated/vendored code.
+# - `query-filters:` (this file) excludes a rule by its query metadata
+#   (`id:`, `tags:`) across the WHOLE repo.  It cannot be scoped to a
+#   path — CodeQL query filters know queries, not source files.
+#
+# For a single rule on a single file — a reviewed false positive — use
+# neither: extend the `Filter known false positives` step in
+# `.github/workflows/codeql.yml`, which strips `path:rule-id` pairs from
+# the SARIF before upload while everything else keeps scanning.
+#
+# This scaffold ships no filters here: suppress an alert only after
+# you've confirmed it's a false positive for a path that actually
+# exists, so a real finding is never silently hidden.

@@ -1,8 +1,6 @@
 # Tools
 
-The tools registered in this server are listed below. See the
-[FastMCP tools documentation](https://gofastmcp.com/servers/tools)
-for the full tool API.
+The tools registered in this server are listed below.
 
 <!-- DOMAIN-TOOLS-LIST-START -->
 Tools are registered only when the API key they need is configured (see

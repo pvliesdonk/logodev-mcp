@@ -16,7 +16,15 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
-    "fastmcp-pvl-core>=4.2.0,<5",
+    # >=4.11.0 for configure_task_backend + ServerConfig.tasks_url (the
+    # background-task backend surface, ADR 0002 §4), which server.py wires
+    # unconditionally.  4.11.0 also moves fastmcp[tasks] into pvl-core's BASE
+    # dependencies, so pydocket arrives transitively — no extra to declare
+    # here, and no packaging plumbing.  (4.10.1 was the previous floor, for
+    # apply_tool_visibility; 4.10.0 was tagged but never reached PyPI, and
+    # the config-surface generator pins the floor exactly, so the floor must
+    # name a version that exists on PyPI.)
+    "fastmcp-pvl-core>=4.11.0,<5",
     "typer>=0.12",
 
     # PROJECT-DEPS-START — add domain dependencies below; kept across copier update
@@ -91,16 +99,40 @@ ignore = ["E501"]
 # FastMCP dependency injection pattern — B008 is a false positive here.
 # Context/FastMCP/Service imports must stay runtime (not TYPE_CHECKING) for
 # DI resolution — TC001/TC002/TC003.
+
+# Template-managed: the structural diff-gate adds `S` (security) on the diff
+# pass, so the shipped structural-gate test would self-block: its asserts trip
+# S101, and its bare-name `git` call trips S607 (a partial executable path —
+# the `sys.executable -m ...` calls are NOT flagged). S603 (subprocess use) is
+# included defensively: inert in current ruff but emitted by some versions.
+# Ignoring all three in tests keeps the gate from self-blocking on its own test
+# module; all three are safe in test code. No-op for the base whole-repo select
+# (which excludes S). If your project needs its own tests/** ignores, EXTEND
+# this list in place — do not add a second "tests/**" key (duplicate TOML key).
+"tests/**" = ["S101", "S603", "S607"]
+# The config-surface generator's bootstrap re-execs itself under `uv run`
+# (os.execvpe with a `shutil.which`-resolved absolute path — see
+# ensure_core_available). S606 flags any no-shell process start for review;
+# here the no-shell form is the safer one, and a `# noqa` instead of this
+# entry would trip RUF100 on the whole-repo pass, where `S` isn't selected.
+"scripts/gen_config_surface.py" = ["S606"]
+
 # PROJECT-RUFF-IGNORES-START — replace, extend, or override the entries below
 # for your project's real source/test paths (split _server_apps.py into
 # per-domain modules, rename tests, add per-file overrides as needed); kept
 # across copier update.
-"src/logodev_mcp/cli.py" = ["B008"]
-"src/logodev_mcp/_server_deps.py" = ["B008", "TC002", "TC003"]
-"src/logodev_mcp/_server_apps.py" = ["B008", "TC001", "TC002"]
-"src/logodev_mcp/tools.py" = ["B008", "TC001", "TC002"]
-"src/logodev_mcp/resources.py" = ["B008", "TC001", "TC002"]
-"src/logodev_mcp/prompts.py" = ["B008", "TC002"]
+# PLR0913 (too-many-args) is ignored on the DI/wiring modules below: FastMCP
+# inflates their arg counts with `Context` + `Depends()` injections, so the
+# structural diff-gate would flag every new tool/resource/prompt and make
+# `# noqa: PLR0913` routine. It only bites when enable_structural_gate is on
+# (PLR0913 isn't in the base select); domain modules keep the check, and
+# C901/PLR0912/PLR0915 still catch a genuinely complex tool here.
+"src/logodev_mcp/cli.py" = ["B008", "PLR0913"]
+"src/logodev_mcp/_server_deps.py" = ["B008", "TC002", "TC003", "PLR0913"]
+"src/logodev_mcp/_server_apps.py" = ["B008", "TC001", "TC002", "PLR0913"]
+"src/logodev_mcp/tools.py" = ["B008", "TC001", "TC002", "PLR0913"]
+"src/logodev_mcp/resources.py" = ["B008", "TC001", "TC002", "PLR0913"]
+"src/logodev_mcp/prompts.py" = ["B008", "TC002", "PLR0913"]
 "tests/conftest.py" = ["TC002", "TC003"]
 "tests/test_smoke.py" = ["TC002", "TC003"]
 "tests/test_tools.py" = ["TC002"]
@@ -113,6 +145,21 @@ known-first-party = ["logodev_mcp"]
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+
+# Structural-gate thresholds. These rules are NOT in the whole-repo `select`
+# above — they apply only on the diff via the structural gate's
+# `--extend-select` (see .pre-commit-config.yaml / ci.yml). Values are ruff
+# defaults, surfaced here as editable policy constants.
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-args = 5
+max-branches = 12
+max-returns = 6
+max-statements = 50
+
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -170,20 +217,86 @@ version_toml = ["pyproject.toml:project.version"]
 commit_parser = "angular"
 tag_format = "v{version}"
 # Bump versioned manifests (server.json) inside the release commit rather
-# than in a follow-up commit + force-retag.  Extend scripts/bump_manifests.py
-# if your project adds more lockstep manifests (plugin.json, .mcp.json, ...).
+# than in a follow-up commit + force-retag.  If your project adds more
+# lockstep manifests (plugin.json, .mcp.json, ...), add the bump inside
+# scripts/bump_manifests.py's DOMAIN-MANIFESTS markers and the path to
+# `assets` below — the script is template-owned, so code outside those
+# markers is overwritten on the next copier update.  `assets` and the script
+# must move together: tests/test_release_contract.py fails the build if one
+# names a manifest the other does not.
 build_command = "python scripts/bump_manifests.py"
 # PSR stages and commits files listed in `assets` together with pyproject.toml
 # and CHANGELOG.md, so the release tag points at a single commit containing
-# all version-coupled files.  Add ".claude-plugin/plugin/.claude-plugin/plugin.json"
-# and ".claude-plugin/plugin/.mcp.json" once your project scaffolds them.
+# all version-coupled files.
 assets = [
     "server.json",
+    # bump_manifests.py also refreshes uv.lock's self-version entry, so the
+    # release commit carries a consistent lockfile instead of leaving drift
+    # for the next `uv run` to re-sync as a side effect.
+    "uv.lock",
+
 ]
 
+# Branch groups: prerelease-ness is a property of the BRANCH, not of a
+# dispatch flag.  `main` always releases stable; a short-lived `release/X.Y`
+# stabilisation branch releases rcs by default, with the release workflow's
+# `finalize` input cutting the final stable X.Y.Z from the branch (it
+# generates a one-run config override, since PSR's CLI can force prerelease
+# ON but not OFF).  A branch matching neither pattern cannot release at all —
+# PSR refuses, which is the desired guard.  After ANY release cut from a
+# `release/*` branch, the branch must merge back into `main` (the release
+# workflow's merge-back job): with the tag unreachable from `main`, PSR
+# computes the same version from `main`'s own history, finds the tag taken
+# repo-globally, and reports "already released" forever.
+[tool.semantic_release.branches.main]
+match = "(main|master)"
+prerelease = false
+
+[tool.semantic_release.branches.release]
+match = "release/.*"
+prerelease = true
+prerelease_token = "rc"
+
+# PSR's changelog runs in `update` mode (the v10 default, pinned here so the
+# contract is visible): each release inserts its version section at the
+# insertion flag in CHANGELOG.md and preserves everything else in the file
+# verbatim.  Both halves are explicit because the flag is load-bearing — a
+# changelog without the flag line is silently never written (template#350).
+# CHANGELOG.md is seeded with the flag; a project whose CHANGELOG.md predates
+# it must add the flag line once, by hand (tests/test_release_contract.py
+# fails with the exact line until it is present).
 [tool.semantic_release.changelog]
+mode = "update"
+insertion_flag = "<!-- version list -->"
+
+# `changelog_file` lives under `default_templates` (its supported location
+# since PSR v9.11); the bare `changelog.changelog_file` key is deprecated.
+[tool.semantic_release.changelog.default_templates]
 changelog_file = "CHANGELOG.md"
 
 [tool.semantic_release.commit_parser_options]
+# The accepted commit types, stated explicitly rather than left to the
+# parser's default, because this list is one half of a contract: CI's
+# `PR Title` job runs scripts/check_pr_title.py against the same set, and
+# tests/test_commit_conventions.py fails when the two halves disagree.
+#
+# Getting a type wrong is not a cosmetic problem. A subject whose type is not
+# listed here does not parse, and PSR then omits the commit from CHANGELOG.md
+# entirely — no fallback heading, no warning. `revert` is added on top of the
+# parser's own default set for exactly that reason: reverts belong in the
+# audit trail, and the default drops them.
+allowed_tags = [
+    "build",
+    "chore",
+    "ci",
+    "docs",
+    "feat",
+    "fix",
+    "perf",
+    "refactor",
+    "revert",
+    "style",
+    "test",
+]
 minor_tags = ["feat"]
 patch_tags = ["fix", "perf"]

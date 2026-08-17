@@ -20,60 +20,43 @@
       },
       "environmentVariables": [
         {
+          "name": "LOGODEV_MCP_KV_STORE_URL",
+          "description": "Persistent-state backend URL shared by every pvl-core subsystem that needs state. `memory://` is in-process and lost on restart; `file:///path` persists on one server; `redis://`, `dynamodb://` and `mongodb://` each need their matching extra. When unset, defaults to `file:///data/state` (the volume family Docker images mount), or to `memory://` — with a warning — on a host where that directory is not usable.",
+          "default": "file:///data/state"
+        },
+        {
+          "name": "LOGODEV_MCP_TOOLS_ALLOW",
+          "description": "Comma-separated explicit tool names this instance exposes; every other tool is hidden from listings and cannot be invoked. Names matching no registered tool are inert. Mutually exclusive with `tools_deny`. Takes effect through `apply_tool_visibility`."
+        },
+        {
+          "name": "LOGODEV_MCP_TOOLS_DENY",
+          "description": "Comma-separated explicit tool names hidden from this instance (absent from listings, cannot be invoked). Names matching no registered tool are inert. Mutually exclusive with `tools_allow`. Takes effect through `apply_tool_visibility`."
+        },
+        {
+          "name": "LOGODEV_MCP_SERVER_NAME",
+          "description": "Rename this server instance; defaults to the project name."
+        },
+        {
+          "name": "LOGODEV_MCP_INSTRUCTIONS",
+          "description": "Replaces the default MCP instructions text sent to clients."
+        },
+        {
           "name": "FASTMCP_LOG_LEVEL",
-          "description": "Log level (DEBUG, INFO, WARNING, ERROR)",
+          "description": "Log level for FastMCP internals and app loggers (DEBUG / INFO / WARNING / ERROR / CRITICAL). The -v CLI flag overrides to DEBUG.",
           "default": "INFO",
           "choices": [
             "DEBUG",
             "INFO",
             "WARNING",
-            "ERROR"
+            "ERROR",
+            "CRITICAL"
           ]
         },
         {
-          "name": "LOGODEV_MCP_SERVER_NAME",
-          "description": "MCP server name shown to clients",
-          "default": "logodev-mcp"
-        },
-        {
-          "name": "LOGODEV_MCP_BEARER_TOKEN",
-          "description": "Bearer token for authentication",
-          "isSecret": true
-        },
-        {
-          "name": "LOGODEV_MCP_AUTH_MODE",
-          "description": "OIDC auth mode: 'remote' (JWKS validation) or 'oidc-proxy' (OAuth proxy). Auto-detected if not set."
-        },
-        {
-          "name": "LOGODEV_MCP_BASE_URL",
-          "description": "Public base URL of this server (required for OIDC)"
-        },
-        {
-          "name": "LOGODEV_MCP_OIDC_CONFIG_URL",
-          "description": "OIDC discovery endpoint URL"
-        },
-        {
-          "name": "LOGODEV_MCP_OIDC_CLIENT_ID",
-          "description": "OIDC client ID"
-        },
-        {
-          "name": "LOGODEV_MCP_OIDC_CLIENT_SECRET",
-          "description": "OIDC client secret",
-          "isSecret": true
-        },
-        {
-          "name": "LOGODEV_MCP_OIDC_JWT_SIGNING_KEY",
-          "description": "Signing key for OIDC session JWTs (critical on Linux/Docker)",
-          "isSecret": true
-        },
-        {
-          "name": "LOGODEV_MCP_OIDC_AUDIENCE",
-          "description": "Expected OIDC token audience"
-        },
-        {
-          "name": "LOGODEV_MCP_OIDC_REQUIRED_SCOPES",
-          "description": "Space-separated required OIDC scopes",
-          "default": "openid"
+          "name": "FASTMCP_ENABLE_RICH_LOGGING",
+          "description": "Set false for plain or structured JSON log output.",
+          "format": "boolean",
+          "default": "true"
         }
       ]
     },
@@ -94,77 +77,128 @@
       ],
       "environmentVariables": [
         {
-          "name": "FASTMCP_LOG_LEVEL",
-          "description": "Log level (DEBUG, INFO, WARNING, ERROR)",
-          "default": "INFO",
-          "choices": [
-            "DEBUG",
-            "INFO",
-            "WARNING",
-            "ERROR"
-          ]
+          "name": "LOGODEV_MCP_BASE_URL",
+          "description": "Public base URL of the deployed server, e.g. `https://mcp.example.com`. Required for OIDC. Also the fallback source of the MCP Apps domain when `app_domain` is unset.",
+          "placeholder": "https://mcp.example.com"
+        },
+        {
+          "name": "LOGODEV_MCP_BEARER_TOKEN",
+          "description": "Single shared bearer token; enables bearer auth unless `bearer_tokens_file` is set, which takes precedence.",
+          "placeholder": "<secret>",
+          "isSecret": true
+        },
+        {
+          "name": "LOGODEV_MCP_OIDC_CONFIG_URL",
+          "description": "OIDC discovery document URL, e.g. `https://auth.example.com/.well-known/openid-configuration`.",
+          "placeholder": "https://auth.example.com/.well-known/openid-configuration"
+        },
+        {
+          "name": "LOGODEV_MCP_OIDC_CLIENT_ID",
+          "description": "OIDC client identifier registered with the provider.",
+          "placeholder": "mcp-client"
+        },
+        {
+          "name": "LOGODEV_MCP_OIDC_CLIENT_SECRET",
+          "description": "OIDC client secret registered with the provider.",
+          "placeholder": "your-client-secret",
+          "isSecret": true
+        },
+        {
+          "name": "LOGODEV_MCP_OIDC_AUDIENCE",
+          "description": "Expected `aud` claim; tokens issued for another audience are rejected.",
+          "placeholder": "mcp-api"
+        },
+        {
+          "name": "LOGODEV_MCP_OIDC_REQUIRED_SCOPES",
+          "description": "Scopes a caller must present, space- or comma-separated. Defaults to `openid` in oidc-proxy mode.",
+          "default": "openid"
+        },
+        {
+          "name": "LOGODEV_MCP_OIDC_JWT_SIGNING_KEY",
+          "description": "Signing key for issued JWTs; used in oidc-proxy mode only. When unset, the key is derived deterministically from `oidc_client_secret`, so tokens survive a restart — but rotating that secret invalidates every issued token. Set this explicitly to decouple token validity from secret rotation. Generate with `openssl rand -hex 32`.",
+          "default": "derived",
+          "isSecret": true
+        },
+        {
+          "name": "LOGODEV_MCP_OIDC_VERIFY_ACCESS_TOKEN",
+          "description": "Validate the access token instead of the id token.",
+          "format": "boolean",
+          "default": "false"
         },
         {
           "name": "LOGODEV_MCP_KV_STORE_URL",
-          "description": "Persistent-state backend URL for pvl-core subsystems. Schemes: file:///path (survives restarts), memory:// (dev/ephemeral).",
+          "description": "Persistent-state backend URL shared by every pvl-core subsystem that needs state. `memory://` is in-process and lost on restart; `file:///path` persists on one server; `redis://`, `dynamodb://` and `mongodb://` each need their matching extra. When unset, defaults to `file:///data/state` (the volume family Docker images mount), or to `memory://` — with a warning — on a host where that directory is not usable.",
           "default": "file:///data/state"
         },
         {
+          "name": "LOGODEV_MCP_APP_DOMAIN",
+          "description": "MCP Apps iframe domain, used for CSP sandboxing. Overrides the host derived from `base_url`."
+        },
+        {
+          "name": "LOGODEV_MCP_TOOLS_ALLOW",
+          "description": "Comma-separated explicit tool names this instance exposes; every other tool is hidden from listings and cannot be invoked. Names matching no registered tool are inert. Mutually exclusive with `tools_deny`. Takes effect through `apply_tool_visibility`."
+        },
+        {
+          "name": "LOGODEV_MCP_TOOLS_DENY",
+          "description": "Comma-separated explicit tool names hidden from this instance (absent from listings, cannot be invoked). Names matching no registered tool are inert. Mutually exclusive with `tools_allow`. Takes effect through `apply_tool_visibility`."
+        },
+        {
+          "name": "LOGODEV_MCP_AUTH_MODE",
+          "description": "Explicit auth-mode override, accepting `remote` or `oidc-proxy` (case- and whitespace-insensitive). When unset the mode is auto-detected from which auth variables are set; the override exists because having all four OIDC variables set is ambiguous between those two modes. Other values are ignored with a warning."
+        },
+        {
+          "name": "LOGODEV_MCP_BEARER_TOKENS_FILE",
+          "description": "Path to a TOML file mapping bearer tokens to subjects; overrides the single-token `bearer_token` mode.",
+          "format": "filepath",
+          "placeholder": "/etc/logodev-mcp/tokens.toml"
+        },
+        {
+          "name": "LOGODEV_MCP_BEARER_DEFAULT_SUBJECT",
+          "description": "Subject assigned to the single-token bearer mode; ignored when `bearer_tokens_file` is set, since mapped mode carries per-token subjects.",
+          "default": "bearer-anon"
+        },
+        {
           "name": "LOGODEV_MCP_SERVER_NAME",
-          "description": "MCP server name shown to clients",
-          "default": "logodev-mcp"
+          "description": "Rename this server instance; defaults to the project name."
+        },
+        {
+          "name": "LOGODEV_MCP_INSTRUCTIONS",
+          "description": "Replaces the default MCP instructions text sent to clients."
+        },
+        {
+          "name": "LOGODEV_MCP_HTTP_PATH",
+          "description": "Mount path for the MCP endpoint.",
+          "default": "/mcp"
         },
         {
           "name": "PUID",
-          "description": "Run as this UID (Docker entrypoint)",
+          "description": "Run the server process as this UID; the container entrypoint chowns writable paths to match.",
           "format": "number",
           "default": "1000"
         },
         {
           "name": "PGID",
-          "description": "Run as this GID (Docker entrypoint)",
+          "description": "Run the server process as this GID; pair with PUID to match the owner of a mounted volume.",
           "format": "number",
           "default": "1000"
         },
         {
-          "name": "LOGODEV_MCP_BEARER_TOKEN",
-          "description": "Bearer token for authentication",
-          "isSecret": true
+          "name": "FASTMCP_LOG_LEVEL",
+          "description": "Log level for FastMCP internals and app loggers (DEBUG / INFO / WARNING / ERROR / CRITICAL). The -v CLI flag overrides to DEBUG.",
+          "default": "INFO",
+          "choices": [
+            "DEBUG",
+            "INFO",
+            "WARNING",
+            "ERROR",
+            "CRITICAL"
+          ]
         },
         {
-          "name": "LOGODEV_MCP_AUTH_MODE",
-          "description": "OIDC auth mode: 'remote' (JWKS validation) or 'oidc-proxy' (OAuth proxy). Auto-detected if not set."
-        },
-        {
-          "name": "LOGODEV_MCP_BASE_URL",
-          "description": "Public base URL of this server (required for OIDC)"
-        },
-        {
-          "name": "LOGODEV_MCP_OIDC_CONFIG_URL",
-          "description": "OIDC discovery endpoint URL"
-        },
-        {
-          "name": "LOGODEV_MCP_OIDC_CLIENT_ID",
-          "description": "OIDC client ID"
-        },
-        {
-          "name": "LOGODEV_MCP_OIDC_CLIENT_SECRET",
-          "description": "OIDC client secret",
-          "isSecret": true
-        },
-        {
-          "name": "LOGODEV_MCP_OIDC_JWT_SIGNING_KEY",
-          "description": "Signing key for OIDC session JWTs (critical on Linux/Docker)",
-          "isSecret": true
-        },
-        {
-          "name": "LOGODEV_MCP_OIDC_AUDIENCE",
-          "description": "Expected OIDC token audience"
-        },
-        {
-          "name": "LOGODEV_MCP_OIDC_REQUIRED_SCOPES",
-          "description": "Space-separated required OIDC scopes",
-          "default": "openid"
+          "name": "FASTMCP_ENABLE_RICH_LOGGING",
+          "description": "Set false for plain or structured JSON log output.",
+          "format": "boolean",
+          "default": "true"
         }
       ]
     }

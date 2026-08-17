@@ -23,11 +23,15 @@
     "entry_point": "src/server.py",
     "mcp_config": {
       "command": "uvx",
-      "args": ["--from", "logodev-mcp[all]==${VERSION}", "logodev-mcp", "serve"],
+      "args": [
+        "--from",
+        "logodev-mcp[all]==${VERSION}",
+        "logodev-mcp",
+        "serve"
+      ],
       "env": {
         "LOGODEV_MCP_SERVER_NAME": "${user_config.server_name}",
-        "LOGODEV_MCP_READ_ONLY":   "${user_config.read_only}",
-        "FASTMCP_LOG_LEVEL":            "${user_config.log_level}"
+        "FASTMCP_LOG_LEVEL": "${user_config.log_level}"
       }
     }
   },
@@ -35,28 +39,24 @@
     "server_name": {
       "type": "string",
       "title": "Server name",
-      "description": "Name shown in the Claude tool list.",
-      "required": false,
-      "default": "logodev-mcp"
-    },
-    "read_only": {
-      "type": "boolean",
-      "title": "Read-only mode",
-      "description": "When true, write-tagged tools are hidden.",
-      "required": false,
-      "default": true
+      "description": "Rename this server instance; defaults to the project name.",
+      "required": false
     },
     "log_level": {
       "type": "string",
       "title": "Log level",
-      "description": "One of: DEBUG, INFO, WARNING, ERROR.",
+      "description": "Log level for FastMCP internals and app loggers (DEBUG / INFO / WARNING / ERROR / CRITICAL). The -v CLI flag overrides to DEBUG.",
       "required": false,
       "default": "INFO"
     }
   },
   "compatibility": {
     "claude_desktop": ">=0.10.0",
-    "platforms": ["darwin", "win32", "linux"],
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
     "runtimes": {
       "python": ">=3.11,<4.0"
     }

@@ -2,9 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, "release/**"]
   pull_request:
-    branches: [main]
+    # release/** keeps backport PRs CI-gated: the shipped rulesets
+    # (.github/rulesets/) require the CI Success check on release/* exactly
+    # as on main, which deadlocks unless CI actually runs there.
+    branches: [main, "release/**"]
   workflow_dispatch:
 
 jobs:
@@ -30,7 +33,19 @@ jobs:
         run: uv python install 3.12
 
       - name: Install dependencies
-        run: uv sync --all-extras --all-groups
+        # `--locked` rather than a bare sync: an unfrozen `uv sync` re-locks
+        # when `uv.lock` is stale relative to `pyproject.toml`, which both
+        # hides the drift (the workspace silently self-heals while the branch
+        # stays broken) and mutates a tracked file mid-job. Fail loudly
+        # instead — this is the check that would have caught the release-commit
+        # lockfile drift in #325 on the release that introduced it, rather
+        # than in an unrelated workflow weeks later (#326). Fix a red install
+        # step with `uv lock`, and commit the result.
+        run: uv sync --all-extras --all-groups --locked
+
+
+      - name: Verify generated config artifacts are up-to-date
+        run: uv run python scripts/gen_config_surface.py --check
 
       - name: Run ruff check
         run: uv run ruff check src/ tests/
@@ -60,7 +75,8 @@ jobs:
         run: uv python install 3.12
 
       - name: Install dependencies
-        run: uv sync --all-extras --all-groups
+        # `--locked` — see the lint job's install step for why.
+        run: uv sync --all-extras --all-groups --locked
 
       - name: Run mypy
         run: uv run mypy src/ tests/
@@ -110,7 +126,8 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: uv sync --all-extras --all-groups
+        # `--locked` — see the lint job's install step for why.
+        run: uv sync --all-extras --all-groups --locked
 
       - name: Run tests with coverage
         run: uv run pytest --cov --cov-report=xml
@@ -280,9 +297,28 @@ jobs:
         # stay authoritative from checkout. Caching the whole .vale/styles tree
         # would let restore-keys overwrite a newly-added vocab term with the
         # stale snapshot on the exact PR that adds the term.
-        # Pack list mirrors the Packages = line in .vale.ini; if you add or
-        # remove a pack, update both. Bump the v1- prefix to evict all cached
+        # Pack list mirrors the Packages = line in .vale.ini. That line is the
+        # source of truth and THREE places restate it by hand: this path: list,
+        # BasedOnStyles in .vale.ini, and the `for p in` list in the vale-sync
+        # pre-commit hook. Adding or removing a pack means changing all three —
+        # a stale BasedOnStyles makes vale exit E100 [loadStyles], and a stale
+        # `for p in` leaves the pre-commit hook blind to the new pack so it
+        # never triggers a sync.
+        # Bump the v1- prefix to evict all cached
         # packs if Vale changes pack format backward-incompatibly.
+        #
+        # NOTE: this cache does not prevent a re-download, and cannot while
+        # this job uses vale-action. `vale sync` wipes and re-creates every
+        # directory in `Packages =` rather than consulting what is on disk
+        # (verified with canary files), so a restored cache is discarded before
+        # it is read unless the sync is skipped — and vale-action runs
+        # `vale sync` unconditionally (`src/input.ts:67`) with no input to skip
+        # it (both checked at the pinned SHA below). This is a constraint of
+        # the action, not a trade being declined: the only route to a
+        # load-bearing cache here is replacing vale-action with a direct
+        # invocation, giving up reviewdog annotations, filter_mode and
+        # fail_on_error. The template's own CI gate calls vale directly and so
+        # does guard its sync.
         uses: actions/cache@v6
         with:
           path: |
@@ -291,9 +327,12 @@ jobs:
             .vale/styles/write-good
             .vale/styles/ai-tells
           key: vale-styles-v1-${{ hashFiles('.vale.ini') }}
-          # Warm-start fallback: restores the most recent pack snapshot when
-          # .vale.ini changes (e.g. URL bump). vale sync then only re-fetches
-          # the changed pack rather than re-downloading all four.
+          # Warm-start fallback, kept for symmetry with the key. It does NOT
+          # save a re-fetch: per the NOTE above, `vale sync` discards whatever
+          # was restored and re-creates every pack directory. An earlier
+          # revision of this comment claimed the restore let vale sync
+          # "re-fetch only the changed pack"; that is not how vale sync
+          # behaves.
           restore-keys: vale-styles-v1-
 
       - name: Run Vale
@@ -307,14 +346,26 @@ jobs:
           # pre-commit hook `rev:` in .pre-commit-config.yaml — template-ci
           # asserts the two stay synchronized.
           version: "3.14.2"
-          files: docs
-          # Working specs follow internal conventions, not user-facing prose
-          # style — exclude from linting. NO inner single quotes around the
-          # glob value: vale-action splits `vale_flags` on whitespace and
-          # passes argv elements directly (no shell), so literal quotes here
-          # would be passed through to Vale, the glob would match no files,
-          # and CI would silently exit 0. Verified empirically.
-          vale_flags: "--glob=!docs/superpowers/**"
+          # Lint the published docs site plus the user-facing README. Both are
+          # operator-facing prose and must stay Vale-clean. Internal dev docs
+          # are excluded via the glob below. Multiple paths MUST be a JSON
+          # array: vale-action only splits the `files` string when `separator`
+          # is set (it defaults to empty), so a space- or comma-joined string
+          # silently falls back to linting the whole repo (".").
+          files: '["docs", "README.md"]'
+          # Dev-reference docs (working specs, design notes, ADRs) follow
+          # internal conventions, not user-facing prose style — exclude from
+          # linting. This mirrors the mkdocs `exclude_docs:` block, which keeps
+          # design/** and decisions/** out of the published site. Use ONE
+          # `--glob` with brace alternation: Vale honors only a single `--glob`
+          # pattern (a repeated flag keeps just the last), so the subtrees must
+          # be combined as `{a,b,c}`. NO inner single quotes around the glob
+          # value: vale-action splits `vale_flags` on whitespace and passes
+          # argv elements directly (no shell), so literal quotes here would be
+          # passed through to Vale, the glob would match no files, and CI would
+          # silently exit 0. Verified empirically. Keep the subtree set in sync
+          # with the pre-commit `- id: vale` exclude (template-ci asserts it).
+          vale_flags: "--glob=!docs/{superpowers,design,decisions}/**"
           # Failure gating is controlled by MinAlertLevel = error in
           # .vale.ini (governs both what Vale prints AND its exit code)
           # combined with fail_on_error below — only error-severity
@@ -330,3 +381,116 @@ jobs:
           # don't gate PRs that don't touch them. To enforce repo-wide
           # cleanliness, set this to `nofilter`.
           filter_mode: added
+
+
+  structure:
+    name: Structural Quality (diff)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Diff-scoped, so only meaningful on a PR (needs a base branch to compare).
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.2.0
+        with:
+          version: "latest"
+
+      - name: Cache Python interpreter
+        uses: actions/cache@v6
+        with:
+          path: ~/.local/share/uv/python
+          key: uv-python-3.12-${{ runner.os }}
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        # `--locked` — see the lint job's install step for why.
+        run: uv sync --all-extras --all-groups --locked
+
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.base_ref }} --depth=50
+
+      - name: Structural quality (changed lines only)
+        # One implementation, shared with the pre-push hook. The explicit
+        # STRUCTURAL_GATE_BASE pins the PR's actual base branch (main or a
+        # release/X.Y for backport PRs); the script's no-Python skip and the
+        # diff-quality invocation live in the script.
+        env:
+          STRUCTURAL_GATE_BASE: origin/${{ github.base_ref }}
+        run: bash scripts/structural_gate.sh
+
+
+  pr-title:
+    name: PR Title
+    # A squash merge takes the pull-request title as the commit subject, and
+    # python-semantic-release drops a subject it cannot parse from
+    # CHANGELOG.md silently — not under a fallback heading, absent. This is
+    # the last point at which that subject can still be corrected.
+    #
+    # PR-only by design: the writers to `main` outside a merge are PSR's own
+    # release commit and the automated merge-back, both machine-generated and
+    # already conformant. On push/dispatch the job is skipped, which the
+    # `ci-success` aggregate below treats as a pass.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check pull-request title
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        # Read the CURRENT title from the API rather than from
+        # `github.event.pull_request.title`. A re-run replays the original
+        # event payload, so an author who fixes the title would otherwise have
+        # to push a commit to clear a red check that a retitle already fixed.
+        run: |
+          set -euo pipefail
+          TITLE="$(gh api "repos/${REPO}/pulls/${PR_NUMBER}" --jq .title)"
+          python3 scripts/check_pr_title.py "$TITLE"
+
+  ci-success:
+    name: CI Success
+    # Single aggregate gate for branch protection / Renovate auto-merge to
+    # require. Succeeds only if every upstream job succeeded or was skipped;
+    # fails if any failed or was cancelled. Requiring this ONE context is
+    # drift-proof — renaming an individual job never silently disables the gate.
+    needs:
+      - lint
+      - typecheck
+      - test
+      - audit
+      - secrets
+      - vale
+      - pr-title
+
+      - structure
+
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify all required jobs passed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Upstream job results: $RESULTS"
+          for result in $RESULTS; do
+            if [ "$result" != "success" ] && [ "$result" != "skipped" ]; then
+              echo "::error::A required job did not pass (result: $result)"
+              exit 1
+            fi
+          done
+          echo "All required jobs passed."
